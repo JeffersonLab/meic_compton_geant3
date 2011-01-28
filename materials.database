@@ -1,0 +1,141 @@
+*
+* This file describes materials and mixtures to be used by GEANT
+*
+* For individual elements the format is
+*   name 1 density material_number
+*	element_name A Z radiation_length 
+*
+* For mixture the format is
+*   name number_of_elements density material_number
+*     element_name A Z weight
+*
+* where name is a unique string describing this material
+* density is the material density in grams/cm^3
+* material_number is the number by which the user refers to this material
+* element_name is a string describing the element
+* A is the atomic number in amus
+* Z is the charge of the element in |e|
+* weight is the relative weight of the materials with respect to the others
+*	if element_number is negative weight is a number ratio
+* radiation_length is in g/cm^2
+*
+* Pure Calcium 40
+*
+Calcium_40 1 1.55 17
+  40Ca 40.08 20 10.4
+*
+* Hyperpure Germanium
+*
+Germanium 1 5.323 18
+  Ge 72.59 32 12.25
+*
+* uncoated mylar
+*
+Mylar -3 1.39 19
+  Carbon   12.011  6 5
+  Hydrogen 1.00794 1 4
+  Oxygen   15.9994 8 2
+*
+* pyrex
+*
+Pyrex 4 2.23 20
+  Silicon 28.0855 14 0.385
+  Boron	  10.811   5 0.039
+  Sodium  22.9898 11 0.038
+  Oxygen  15.9994  8 0.538
+*
+* Freon
+*
+Freon -3 4.93e-3 21
+  Carbon   12.011   6 1
+  Chlorine 35.4527 17 1
+  Fluorine 18.9984  9 3
+*
+* CO2 (Carbon Dioxide at STP)
+*
+CO2 -2 1.977e-3 22
+  Carbon 12.011  6 1
+  Oxygen 15.9994 8 2
+*
+* Polyethylene
+*
+Polyethylene -2 0.935 23
+  Carbon   12.011   6 1
+  Hydrogen  1.00794 1 2
+*
+* NE102 scintillator
+*
+NE102 -2 1.023 24
+  Carbon    12.011   6 1
+  Hydrogen   1.00794 1 1
+*
+* Havar Co(42.5) Cr(20) Ni(13) Fe W Mo Mn
+*
+Havar 7 8.3 25
+  Cobalt    58.9332 27 0.5346
+  Chromium  51.9961 24 0.2516
+  Nickel    58.69   28 0.1635
+  Iron      55.847  26 0.012579
+  Tungsten 183.85   74 0.012579
+  Molybdeum 95.94   42 0.012579
+  Manganese 54.9381 25 0.012579
+*
+* Kapton C(22) H(10) O(5) N(2)
+*
+Kapton -4 1.42 26
+  Carbon   12.011   6 22
+  Hydrogen  1.00794 1 10
+  Oxygen   15.9994  8  5
+  Nitrogen 14.0067  7  2
+*
+* NaI for Detectors
+*
+NaI -2 3.67 27
+  Sodium   22.9898 11 1
+  Iodine  126.905  53 1
+*
+* Lead glass from UPenn (F101)
+*
+PbGlass_F101 6 3.86 28
+  Lead      207.19   82 0.46397
+  Potassium  39.102  19 0.04383
+  Silicon    28.088  14 0.19863
+  Sodium     22.99   11 0.00193
+  Oxygen     15.9994  8 0.27536
+  Cerium    140.13   58 0.01628
+*
+* NaBi Cerenkov detector from UPenn
+*
+NaBI -4	7.57 29
+  Sodium    23.00   11 1.
+  Bismuth  208.98   83 1.
+  Tungsten 183.84   74 2.
+  Oxygen    15.9994  8 8.
+*
+* CsI detector
+*
+CsI -2 4.53 30
+  Cesium        132.90543  55   1.
+  Iodine        126.905    53   1. 
+*
+* My vaccuum - H2 gas at 1 atm (760 Torr) - scale to low density (1 10^-8 Torr)
+*
+my_vac 1 8.38e-5 31
+  Hydrogen 1.00794 1 61.2
+*
+* Lead tungstate PbWO4
+*
+PbWO4 -3 8.28 32
+    Lead     207.19   82 1
+    Tungsten 183.84   74 1
+    Oxygen    15.9994  8 4
+*
+* Silicon
+*
+Silicon 1 2.33 33
+  Si 28.0855 14 21.82
+*
+* Polycrystalline CVD Diamond 
+*
+Diamond 1 3.5 34
+  Carbon   12.011   6 42.70

@@ -1,0 +1,16 @@
+clr
+do i=1,100
+   trig 
+*   draw cave 90 0 0 136 3 0.3 0.3
+*   draw cave 90 0 0 350 -25 0.80 0.80
+*   draw cave 90 0 0 855 -78 2.0 2.0
+*   draw cave 65 0 0 775 -81 2.0 2.0
+   draw cave 90 0 0 10 3 0.015 0.25
+*   draw cave 90 90 0 10 5 0.02 0.02
+*   draw cave 90 0 0 30 5 0.05 0.05
+*   draw cave 90 0 0 18 5 .032 .032
+*   draw cave 90 0 0 10 5 .02 .02
+*   trig 
+*   draw ebox 70 30 20 10 10 4 4
+   dxyz
+enddo
