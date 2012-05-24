@@ -17,7 +17,7 @@ c  - all ntuples have the same structure
 
 	integer iostat
 
- 	call hropen (90, 'HISTOS', 'compton.hbook', 'N', 1024, iostat)
+ 	call hropen (90, 'HISTOS', 'compton.hbook', 'N', 4096, iostat)
 	if (iostat .ne. 0) then
 	  write (*,*) ' Error in hropen ', iostat
 	  return
