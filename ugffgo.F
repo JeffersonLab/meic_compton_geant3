@@ -47,9 +47,10 @@ c Define the beam input card
 
 c Define the halo input card
 
-      call ffkey('HALO', halo, 3, 'REAL') ! define halo card
+      call ffkey('HALO', halo, 4, 'REAL') ! define halo card
 
       halo_fraction  = 1e-7     ! fraction
+      halo_radius_min = 0.0     ! cm
       halo_radius    = 1.       ! cm
       halo_changle   = 0.6      ! mr
 
@@ -219,14 +220,14 @@ c      dipole_field = 3.335641 * beam_E / dipole_rho   ! Tesla
       dipole_field = dipole_field * 10.               ! T -> kG
       if(dipole_rho.gt.0.0) then
          dipole_bend = asin(dipole_length/100.0/dipole_rho)
-         dipole_h    = dipole_rho*(1.0-cos(dipole_bend))
+         dipole_h    = 100.0*dipole_rho*(1.0-cos(dipole_bend)) ! cm
          dipole_bend = dipole_bend*180./Pi
       endif
       write(98,*) 'no more cheesy poofs',dipole_bend,dipole_field
       
       suppression_threshold = suppression_threshold * 1e-6 ! keV -> GeV
       
-      write(98,*) ' Dipole h ', dipole_h, ' m'
+      write(98,*) ' Dipole h ', dipole_h, ' cm'
       write(98,*) ' Dipole bending angle ', dipole_bend, ' deg'
       write(98,*) ' Dipole rho ', dipole_rho, ' m'
       write(98,*) ' Beam energy ', beam_E, ' GeV'

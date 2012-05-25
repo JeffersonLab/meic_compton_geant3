@@ -156,11 +156,12 @@ c -June 7, 2003
 *	record /halo/ halo
 *	structure /halo/
  	  real halo_fraction
+          real halo_radius_min
  	  real halo_radius
  	  real halo_changle
 *	end structure
 	common /halo/
-     +	 halo_fraction, halo_radius, halo_changle
+     +	 halo_fraction, halo_radius_min, halo_radius, halo_changle
 	equivalence (halo,halo_fraction)
 	real halo
 
