@@ -41,7 +41,8 @@ c  - add option to use field map instead of a single value for the dipole field
 c
 c-----------------
 c
-        fieldmap=.true.
+        fieldmap=.false.
+c        fieldmap=.true.
         
 	field(1) = 0				! initially no field
 	field(2) = 0
