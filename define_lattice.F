@@ -86,7 +86,7 @@ c         call gsatt ('DIPO', 'SEEN', 1)	! dipole is visible
 
          ! from drawing file EXP-245-7982-007
          pars(1) = 22.           !  a guess
-         pars(2) = dipole_height
+         pars(2) = dipole_height/2.0
          pars(3) = dipole_length / 2.
          call ugsvolu('DIPO','BOX  ',magnet_mate,pars,3,volume_num)
          pars(1) = 3./2.      
@@ -98,14 +98,14 @@ c         call gsatt ('DIPO', 'SEEN', 1)	! dipole is visible
 
 C DJG: First dipole
 cpat         pars(2) = chicane_drop - dipole_h/2.0
-         pars(2) = chicane_drop
+         pars(2) = chicane_drop - dipole_h/2.0 ! offset to account for sagitta
          pars(3) = - chicane_mid/2. - dipole_length 
      $             - chicane_drift - dipole_length/2.
 c         call gspos ('DIPO', 1, mother, 0., pars(2), pars(3), 1, 'ONLY')
          call gspos ('DIPO', 1, mother, 0., pars(2), pars(3), 0, 'ONLY')
 
 C DJG: Second dipole
-         pars(2) = 0.0
+         pars(2) = 0.0+dipole_h/2.0
 cpat         pars(3) = -chicane_length/2. + dipole_length/2. + 
 cpat     $        chicane_drift + dipole_length
          pars(3) = -chicane_mid/2. - dipole_length/2.
@@ -113,7 +113,7 @@ c         call gspos ('DIPO', 2, mother, 0., pars(2), pars(3), 2, 'ONLY')
          call gspos ('DIPO', 2, mother, 0., pars(2), pars(3), 0, 'ONLY')
 
 C DJG: Third dipole
-         pars(2) = 0.0
+         pars(2) = 0.0+dipole_h/2.0
 cpat         pars(3) = -chicane_length/2. + dipole_length/2. + 
 cpat     $       chicane_drift + dipole_length + chicane_mid + dipole_length
          pars(3) = chicane_mid/2. + dipole_length/2.
@@ -123,7 +123,7 @@ c         call gspos ('DIPO', 3, mother, 0., pars(2), pars(3), 3, 'MANY')
 
 C DJG: Fourth dipole
 cpat         pars(2) = chicane_drop !+ dipole_h/2.0
-         pars(2) = chicane_drop
+         pars(2) = chicane_drop-dipole_h/2.0
          pars(3) = chicane_mid/2. + dipole_length 
      $             + chicane_drift + dipole_length/2.
 cpat         pars(3) = -chicane_length/2. + dipole_length/2. +
