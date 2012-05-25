@@ -36,6 +36,7 @@ c Doug Storey Jan 23 2007
       character*(*) mother      ! name of volume to put this in
       integer pipe_mate, pipe_vac, volume_a, volume_b
       integer beamline_mate, port_mate, foil_mate
+      integer flange_mate
       real port_length
       parameter (port_length=150.)
       real pars(11)
@@ -56,21 +57,24 @@ c Doug Storey Jan 23 2007
       call ugstmed (foil_mate, 'exit foil$', int(foil_material + 0.5),
      1     0, 0, FIELDM, TMAXFD, STEMAX, DEEMAX, EPSIL, 
      2     STMIN, 0, 0)
+      call ugstmed (flange_mate, 'beampipe flange$', IRON_MATE,
+     1     0, 0, FIELDM, TMAXFD, STEMAX, DEEMAX, EPSIL, 
+     2     STMIN, 0, 0)
 
 c vacuum pipe in straight section
 
-      pars(1) =  0.
-      pars(2) =  3
+      pars(1) =  0.0
+      pars(2) =  3.0
       pars(3) = (chicane_mid + 1.4)/2. ! small overlap to prevent air leaks
       call ugsvolu ('PIPE', 'TUBE', pipe_mate, pars, 3, volume_a)
 
       pars(1)=0
       pars(2)=3.0
-      pars(3)=0.6
+      pars(3)=0.635
       call ugsvolu ('UPPL', 'TUBE', pipe_mate, pars, 3, volume_a)   !aperture
       call ugsvolu ('DNPL', 'TUBE', pipe_mate, pars, 3, volume_a)
 
-      pars(1)=0
+      pars(1)=0.0
       pars(2)=2.5
       pars(3) = (chicane_mid + 1.4)/2.   ! small overlap to prevent air leaks
       call ugsvolu ('PIVE', 'TUBE', pipe_vac, pars, 3, volume_a)
@@ -85,7 +89,7 @@ c vacuum pipe in straight section
 
       pars(1) = 0.5
       pars(2) = 2.0    ! half lengths
-      pars(3) = 0.7
+      pars(3) = 0.635
       call ugsvolu('UHOL', 'BOX ',pipe_vac, pars, 3, volume_a)       ! openings
       call ugsvolu('DHOL', 'BOX ',pipe_vac, pars, 3, volume_a)
 
@@ -112,10 +116,10 @@ c vacuum pipe in straight section
 c vacuum pipe in upstream leg
 
       pars(1) =  0.
-      pars(2) =  3.0
+      pars(2) =  3.81 ! 3 inch pipe
       pars(3) = (chicane_drift + 6.4)/2. !small overlap prevents air leaks
       call ugsvolu ('PIP2', 'TUBE', pipe_mate, pars, 3, volume_b)
-      pars(2) =  2.5
+      pars(2) =  3.5
       call ugsvolu ('PIV2', 'TUBE', pipe_vac, pars, 3, volume_b)
 
 
@@ -126,36 +130,52 @@ c vacuum pipe in upstream leg
       call gsatt ('PIP2', 'COLO', BLACK) ! Change color of the Pipe
       call gsatt ('PIP2', 'SEEN', 1) ! Pipe is visible
 
-c vacuum pipe in downstream leg (enlarged to contain recoil tracks)
-c      pars(1) = (chicane_drift + 8.)/2. ! small overlap
-      pars(1) = (chicane_drift + dipole_length/2.)/2. ! small overlap
-      pars(2) = 10.3
-      pars(3) = 90.
-      pars(4) = 3.5
-      pars(5) = 3.0
-      pars(6) = 3.0
-      pars(7) = 0.
-      pars(8) = 6.0
-      pars(9) = 3.0
-      pars(10) = 3.0
-      pars(11) = 0.
-      call ugsvolu ('PIP3', 'TRAP', pipe_mate, pars, 11, volume_b)
-      pars(4) = 3.0
-      pars(5) = 2.5
-      pars(6) = 2.5
-      pars(8) = 5.5
-      pars(9) = 2.5
-      pars(10) = 2.5
-      call ugsvolu ('PIV3', 'TRAP', pipe_vac, pars, 11, volume_b)
-c     call gspos ('PIV3', 1, 'PIP3', 0., 0., 0., 0, 'ONLY')
+c vacuum pipe in downstream leg - just make the pipe bigger
+
+      pars(1) =  0.
+      pars(2) =  3.81 ! 3 inch pipe
+      pars(3) = (chicane_drift + 6.4)/2. !small overlap prevents air leaks
+      call ugsvolu ('PIP3', 'TUBE', pipe_mate, pars, 3, volume_b)
+      pars(2) =  3.5 
+      call ugsvolu ('PIV3', 'TUBE', pipe_vac, pars, 3, volume_b)
       call gspos ('PIV3', 1, 'PIP3', 0., 0., 0., 0, 'MANY')
+      pars(2) = chicane_drop/2.
+      pars(3) = chicane_length/2. - chicane_drift/2. - dipole_length
+      call gspos ('PIP3', 1, mother, 0., pars(2), pars(3), 6, 'MANY')
       call gsatt ('PIP3', 'COLO', BLACK) ! Change color of the Pipe
       call gsatt ('PIP3', 'SEEN', 1) ! Pipe is visible
-      pars(1) = 0.
-      pars(2) = chicane_drop/2. + 1.0
-      pars(3) = chicane_length/2. - chicane_drift/2. - dipole_length
-c     call gspos ('PIP3', 1, mother, pars(1), pars(2), pars(3), 0, 'ONLY')
-      call gspos('PIP3',1,mother,pars(1),pars(2),pars(3),0,'MANY')
+
+C DG - this is not what we did in reality
+cc vacuum pipe in downstream leg (enlarged to contain recoil tracks)
+cc      pars(1) = (chicane_drift + 8.)/2. ! small overlap
+c      pars(1) = (chicane_drift + dipole_length/2.)/2. ! small overlap
+c      pars(2) = 10.3
+c      pars(3) = 90.
+c      pars(4) = 3.5
+c      pars(5) = 3.0
+c      pars(6) = 3.0
+c      pars(7) = 0.
+c      pars(8) = 6.0
+c      pars(9) = 3.0
+c      pars(10) = 3.0
+c      pars(11) = 0.
+c      call ugsvolu ('PIP3', 'TRAP', pipe_mate, pars, 11, volume_b)
+c      pars(4) = 3.0
+c      pars(5) = 2.5
+c      pars(6) = 2.5
+c      pars(8) = 5.5
+c      pars(9) = 2.5
+c      pars(10) = 2.5
+c      call ugsvolu ('PIV3', 'TRAP', pipe_vac, pars, 11, volume_b)
+cc     call gspos ('PIV3', 1, 'PIP3', 0., 0., 0., 0, 'ONLY')
+c      call gspos ('PIV3', 1, 'PIP3', 0., 0., 0., 0, 'MANY')
+c      call gsatt ('PIP3', 'COLO', BLACK) ! Change color of the Pipe
+c      call gsatt ('PIP3', 'SEEN', 1) ! Pipe is visible
+c      pars(1) = 0.
+c      pars(2) = chicane_drop/2. + 1.0
+c      pars(3) = chicane_length/2. - chicane_drift/2. - dipole_length
+cc     call gspos ('PIP3', 1, mother, pars(1), pars(2), pars(3), 0, 'ONLY')
+c      call gspos('PIP3',1,mother,pars(1),pars(2),pars(3),0,'MANY')
       
 c add exit port for backscatter gammas
 
@@ -170,7 +190,7 @@ c add exit port for backscatter gammas
       call ugsvolu ('FOIL', 'TUBE', foil_mate, pars, 3, volume_a)
       pars(3) = port_length / 2. - pars(3)
       call gspos ('FOIL', 1, 'PORV', 0., 0., pars(3), 0, 'ONLY')
-      pars(3) = pars(3) + chicane_mid/2 + dipole_length*3/4
+      pars(3) = pars(3) + chicane_mid/2 + dipole_length*0.9
       call gspos ('PORT', 1, mother, 0., 0., pars(3), 0, 'ONLY')
       call gsatt ('PORT', 'COLO', BLACK) ! Change color of the port
       call gsatt ('PORT', 'SEEN', 1) ! port is visible
