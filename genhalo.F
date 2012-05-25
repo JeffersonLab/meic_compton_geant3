@@ -18,6 +18,11 @@ c    but absorption in the beam pipe and magnetic analysis will tend to
 c    counteract this effect by truncating the tails for distant sources.
 c    Until we have measurements of the halo, this model is probably the
 c    best we can do.
+C Dave Gaskell May 2012
+C       Modify to generate a "flat" distribution between some minimum and 
+c       maximum radius. This change was made to more quickly simulate 
+c       the interaction of beam halo on small apertures in the Compton
+
 
 	implicit none
 
@@ -36,14 +41,23 @@ c    best we can do.
 c First define the electron vertex at the beginning of the chicane
 
 	call grndm (randoms, 2)
-	Gclip = 1 / (1 + (rcut * beam_sigmax / halo_radius)**2)
-	G = randoms(1) * Gclip
-	r = sqrt(1/G - 1)
-	phi = randoms(2) * 2*Pi
-	vertex(1) = r * rcut * cos(phi) * beam_sigmax
-	vertex(2) = r * rcut * sin(phi) * beam_sigmay + chicane_drop
-	vertex(3) = -chicane_length / 2. + 0.8
+C DG: Old, RJ approach
+c	Gclip = 1 / (1 + (rcut * beam_sigmax / halo_radius)**2)
+c	G = randoms(1) * Gclip
+c	r = sqrt(1/G - 1)
+c	phi = randoms(2) * 2*Pi
+c	vertex(1) = r * rcut * cos(phi) * beam_sigmax
+c	vertex(2) = r * rcut * sin(phi) * beam_sigmay + chicane_drop
+c	vertex(3) = -chicane_length / 2. + 0.8
 
+C DG: new approach
+C change to assume flat distribution between rmin and rmax
+	r = halo_radius_min + randoms(1)*(halo_radius-halo_radius_min)
+	phi = randoms(2) * 2*Pi
+	vertex(1) = r * cos(phi)
+	vertex(2) = r * sin(phi) 
+     >              + chicane_drop
+	vertex(3) = -chicane_length / 2. - 1.0
 c Now define the beam electron momentum
 
 	call grndm (randoms, 3)
