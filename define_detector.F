@@ -152,7 +152,7 @@ c  detector_offset: position of the lower edge of the detector above the main el
          call ugsvolu('EBOX', 'BOX ', recoil_vac, pars, 3, volume_num)
          le      = chicane_drift + detector_position 
          pars(1) = 0.
-         pars(2) = dipole_h*100.0 + le*tan(thetab) 
+         pars(2) = dipole_h + le*tan(thetab) 
      >             - detector_planeoffset 
      >             + detector_offset
      >             +  0.5 * detector_height
