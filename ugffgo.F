@@ -102,10 +102,11 @@ c Define backscatter card
 
 c Define the dipole input card
 
-      call ffkey('DIPOLE', dipole, 2, 'REAL') ! define dipole card
+      call ffkey('DIPOLE', dipole, 3, 'REAL') ! define dipole card
 
       dipole_length = 0.     ! cm
       dipole_height = 0.     ! cm
+      dipole_current= 100.0  ! A
 c      dipole_rho    = 1.    ! m
 
 	
@@ -214,8 +215,14 @@ c     1	'a different LUN'
       
 c      dipole_field = 3.335641 * beam_E / dipole_rho   ! Tesla
   
-      dipole_field = (beam_E/0.3)*chicane_drop/100.0
-     $        /((dipole_length+chicane_drift)*dipole_length*1E-4)    ! Tesla
+c      dipole_field = (beam_E/0.3)*chicane_drop/100.0
+c     $        /((dipole_length+chicane_drift)*dipole_length*1E-4)    ! Tesla
+C get field from current (use field map): good to 0.1% from 60 to 110 A
+      dipole_field = 52.335*dipole_current + 65.660  !Gauss
+C     Note that this field is extracted from a map that gives
+C     Leff =124.58 cm. We want same Bdl but assuming 125 cm
+C     So B_MC = B_map*Lmap/Lideal = B_map * 124.58/125.0      
+      dipole_field = dipole_field * (124.58/125.0) *1.0E-4
       dipole_rho   = beam_E/0.3/dipole_field          ! in m
       dipole_field = dipole_field * 10.               ! T -> kG
       if(dipole_rho.gt.0.0) then
@@ -231,6 +238,7 @@ c      dipole_field = 3.335641 * beam_E / dipole_rho   ! Tesla
       write(98,*) ' Dipole bending angle ', dipole_bend, ' deg'
       write(98,*) ' Dipole rho ', dipole_rho, ' m'
       write(98,*) ' Beam energy ', beam_E, ' GeV'
+      write(98,*) ' Dipole current ', dipole_current, ' A'
       write(98,*) ' Dipole field ', dipole_field, ' kG'
       
 c     seed = 1122334455			! some initial seed
