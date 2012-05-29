@@ -1,10 +1,10 @@
 c
 c Compton Polarimeter (Qweak)
 c
-c beam energy 1.165 
+c beam energy 1.160 
 c laser (see below)
 c gamma detector lead tungstate
-c electron detector silicon
+c electron detector diamond
 c
 LIST
 TRIGGER 10
@@ -65,8 +65,7 @@ c	beta y of beam at exit to straight section in m
 c	emittance of beam in m-radians
 c	electron beam polarization
 c
-BEAM 1.165 10e-3 150.  8. 8.  8. 8.  8. 8.  4.4e-10 0.85
-c BEAM 1.165 0.001 150.  8. 8.  8. 8.  8. 8.  1.0e-45 0.80
+BEAM 1.158 10.0e-6 180.  8. 8.  8. 8.  8. 8.  4.4e-10 1.0
 c
 c
 c HALO:
@@ -81,12 +80,12 @@ c
 c DIPOLE:
 c	length of the dipole in cm (0 -> no dipole)
 c	height of the dipole in cm  ! was 4.125in before adjusting
-c	radius of curvature in m
+c       current in A
 c
 C
 c DIPOLE 125. 10.4775 6.93932413
 c DIPOLE 125. 10.625
-DIPOLE 125. 20.955 
+DIPOLE 125. 20.955 103.5
 c
 c CHICANE:
 c	length of chicane (m) 
