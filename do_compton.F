@@ -152,6 +152,8 @@ c         write(90,*)'alpha_c= ',1000.0*(Pi-theta_photon*Pi/180.0)
          theta_cm = acosd((2. * randoms(1)) - 1.) ! cm angle (deg)
          call compton_xsect (Ebeam, Ephoton, theta_photon, theta_gamma,
      $        E_gamma, theta_cm, xsect, pol_xsect)
+c DJG Actually apply the beam and laser polarizations (duh)
+         pol_xsect = pol_xsect*beam_polarization*laser_pol
          
          newvertex(1) = x
          newvertex(2) = y
