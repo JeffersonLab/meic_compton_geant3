@@ -104,11 +104,16 @@ c     Now calculate the lab angle
       theta_gamma = dacosd(P_par / E_gamma)
       
       a = 1. / (1. + 4. * gamma * E_photon / mass) ! page 6 of our prop
-      
-      E_max = E_photon * (Eb - pb * dcosd(theta_photon)) /
-     $     (Eb + E_photon - pb * cosd(0.) + 
-     $     E_photon * dcosd(theta_photon))
 
+CDG wrong sign on last term in denominator      
+c      E_max = E_photon * (Eb - pb * dcosd(theta_photon)) /
+c     $     (Eb + E_photon - pb * cosd(0.) + 
+c     $     E_photon * dcosd(theta_photon))
+
+C DJG sign corrected.
+      E_max = E_photon * (Eb - pb * dcosd(theta_photon)) /
+     $     (Eb + E_photon - pb * cosd(0.) - 
+     $     E_photon * dcosd(theta_photon))
 
       rho = E_gamma / E_max
       
