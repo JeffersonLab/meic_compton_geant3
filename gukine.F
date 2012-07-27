@@ -29,7 +29,7 @@ c    generating process.
 	real vertex(3), p(3)
 	integer vertex_num, track_num, type
 	integer i
-	real random				! random number
+	real*8 random, grnd				! random number
 	real user(4)
 
 	real pressure				! pressure in vacuum line (torr)
@@ -98,7 +98,7 @@ c Now take care of source lines
 	    vertex(2) = 0
 	    vertex(3) = 0
 	    call ugsvert (vertex, 0, 0, 0, 0, vertex_num)! where the vertex is
-	    call grndm(random, 1)
+	    random = grnd()
 	    i = int(1. + random * sources_quantity)
 	    p(1) = 0
 	    p(2) = 0
