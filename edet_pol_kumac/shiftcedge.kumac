@@ -1,0 +1,51 @@
+ ve/del *
+
+exe hallc#setup
+
+set *fon 66
+set ysiz 20
+set csiz 0.4
+set asiz 0.5
+opt utit
+*set xlab 2.5
+
+*shapes: 20=filled circle, 21=filled square, 22 triangle
+
+* pmci colors: 1=black, 2=red, 4=blue, 6=magenta
+
+
+
+
+ zone 1 2 1
+
+ null -0.092 0.092 84.55 85.75
+
+ ve/read shift,pol1,chisq,P2 shift2.dat
+
+ dim=$vdim(pol1, 1) 
+
+
+
+ hplot/symbols shift pol1 [dim] 20 .15
+
+
+
+ hplot/atitle ! 'Polarization (%)'
+
+
+ set txci 1; itx 0.0 85.4 'Pol. Error "a# "A#0.55"Y#'
+
+
+
+ zone 1 2 2 s
+
+ null -0.092 0.092 15 90
+
+
+ hplot/symbols shift chisq [dim] 20 .15
+
+
+
+ set txci 1
+ hplot/atitle 'Shift of Compton Edge (mm)' '[v]^2'
+
