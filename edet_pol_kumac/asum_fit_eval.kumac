@@ -1,0 +1,83 @@
+maxdist=[1]
+cedge=[2]
+p2=[3]
+numberofparam=[4]
+en=[5]
+me = [6] 
+pi = [7] 
+hbarc = [8]
+lambda = [9]
+ldet=[10]
+rhc1=[11]
+rhc2=[12]
+rhc3=[13]
+rhc4=[14]
+pol=[15]
+effwid=[16]
+strip_width=[17]
+i=[18]
+effstr=[19]
+
+ve/cr maxdist(1) r [maxdist]
+ve/cr cedge(1) r [cedge]
+ve/cr p2(1) r [p2]
+ve/cr numberofparam(1) r [numberofparam]
+ve/cr en(1) r [en]
+ve/cr me(1) r [me]
+ve/cr pi(1) r [pi]
+ve/cr hbarc(1) r [hbarc]
+ve/cr lambda(1) r [lambda]
+ve/cr ldet(1) r [ldet]
+ve/cr rhc1(1) r [rhc1]
+ve/cr rhc2(1) r [rhc2]
+ve/cr rhc3(1) r [rhc3]
+ve/cr rhc4(1) r [rhc4]
+ve/cr pol(1) r [pol]
+ve/cr effwid(1) r [effwid]
+ve/cr strwid(1) r [strip_width]
+ve/cr i(1) r [i]
+ve/cr effstr(1) r [effstr]
+       
+      sigma alpha=1.0/137
+      sigma ro=alpha*hbarc/me   
+  
+      sigma k=2*pi*hbarc/(lambda*1e6)
+      sigma gamma=en/me
+      sigma a=1.0/(1.0+4*k*gamma/me)
+ 
+ 
+if (numberofparam = 1) then
+      sigma dist=maxdist-((strwid*1000.)*(cedge-i))
+endif
+
+if (numberofparam = 2) then
+      sigma dist=maxdist-((strwid*1000.)*(cedge-i))*effwid
+endif
+
+if (numberofparam = 3) then
+      sigma dist=maxdist-((strwid*1000.)*(effstr-i))*effwid
+*      sigma dist=maxdist-((strwid*1000.)*(effstr-i))
+endif
+
+
+      sigma rho=(rhc1)+(rhc2)*dist
+      sigma rho=rho+(rhc3)*dist**2
+      sigma rho=rho+(rhc4)*dist**3
+  
+      sigma cr1=(rho*rho*(1.0-a)*(1.0-a))/(1.0-rho*(1.0-a)) 
+      sigma cr2=((1.0-rho*(1.0+a))/(1.0-rho*(1.0-a)))**2    
+      sigma cr3=2.0*pi*ro*ro*a			      
+      sigma cr=cr3*(cr1+1.0+cr2)			      
+
+      sigma a1=2.0*pi*ro*ro*a/cr			      
+      sigma a2=(1.0-rho*(1.0+a))			      
+      sigma a3=1.0/(1-rho*(1-a))**2			      
+      sigma as=a1*a2*(1-a3)				      
+     
+      sigma asumfit=pol*as       
+*      sigma asumfit=0.85*as 
+
+  ve/del maxdist,cedge,p2,numberofparam,en,me,pi,hbarc,lambda
+  ve/del ldet,rhc1,rhc2,rhc3,rhc4,pol,effwid,i
+  ve/del alpha,ro,k,gamma,a,dist,rho,cr1,cr2,cr3,cr,a1,a2,a3
+  ve/del as,strwid,effstr          
