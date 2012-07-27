@@ -32,7 +32,7 @@ c       the interaction of beam halo on small apertures in the Compton
 	include 'params.inc'
 
 	real vertex(3), p(3)
-	real randoms(4)				! random numbers
+	real*8 grnd, rand1, rand2, rand3, rand4, rand5			! random numbers
 	real rcut,tcut
 	parameter (rcut = 5, tcut = 1)
 	real theta,phi,momentum
@@ -40,7 +40,11 @@ c       the interaction of beam halo on small apertures in the Compton
 
 c First define the electron vertex at the beginning of the chicane
 
-	call grndm (randoms, 2)
+	rand1 = grnd()
+        rand2 = grnd()
+        rand3 = grnd()
+        rand4 = grnd()
+        rand5 = grnd()
 C DG: Old, RJ approach
 c	Gclip = 1 / (1 + (rcut * beam_sigmax / halo_radius)**2)
 c	G = randoms(1) * Gclip
@@ -52,19 +56,19 @@ c	vertex(3) = -chicane_length / 2. + 0.8
 
 C DG: new approach
 C change to assume flat distribution between rmin and rmax
-	r = halo_radius_min + randoms(1)*(halo_radius-halo_radius_min)
-	phi = randoms(2) * 2*Pi
+	r = halo_radius_min + rand1 *(halo_radius-halo_radius_min)
+	phi = rand2 * 2*Pi
 	vertex(1) = r * cos(phi)
 	vertex(2) = r * sin(phi) 
      >              + chicane_drop
 	vertex(3) = -chicane_length / 2. - 1.0
 c Now define the beam electron momentum
 
-	call grndm (randoms, 3)
-	G = randoms(1)
+c	call grndm (randoms, 3)
+	G = rand3
 	theta = sqrt(1/G - 1) * halo_changle
-	phi = randoms(2) * 2*Pi
-	momentum = beam_E + beam_dE * randoms(3)
+	phi = rand4 * 2*Pi
+	momentum = beam_E + beam_dE * rand5
 	p(1) = momentum * sin(theta) * cos(phi)
 	p(2) = momentum * sin(theta) * sin(phi)
 	p(3) = momentum * cos(theta)

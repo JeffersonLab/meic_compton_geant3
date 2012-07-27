@@ -13,12 +13,14 @@ C.    *                                                                *
 C.    ******************************************************************
 C.
 
-      DIMENSION RNDM(2)
+      Real*8 RNDM1,RNMD2,grnd
 *
-      CALL GRNDM(RNDM,2)
+c      CALL GRNDM(RNDM,2)
 c      WRITE(90,*)RNDM(1),RNDM(2)
-      Y=RNDM(1)
-      Z=RNDM(2)
+      RNDM1 = grnd()
+      RNDM2 = grnd()
+      Y=RNDM1
+      Z=RNDM2
       X=6.283185*Z
       A1=SQRT (-2.0*LOG(Y))
       A=A1*SIN (X)

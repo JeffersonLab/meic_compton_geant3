@@ -23,13 +23,14 @@ c
 	include 'params.inc'
 
 	real vertex(3), p(3)
-	real random1, random2			! random numbers
+	real random1, random2, grnd		! random numbers
 	real*8 thetax, thetay			! beam divergence in radians
 	real*8 px, py, momentum			! electron momentum
 
 c First define the electron vertex at the beginning of the chicane
 
-	call granor (random1, random2)
+	random1 = grnd()
+        random2 = grnd()
 	vertex(1) = random1 * beam_sigmax
 	vertex(2) = chicane_drop + random2 * beam_sigmay
 	vertex(3) = -chicane_length / 2. + 0.8

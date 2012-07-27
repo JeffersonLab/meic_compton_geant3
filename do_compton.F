@@ -46,9 +46,10 @@ c      real*8 E_recoil
       real*8 phi_photon, phi_gamma, luminosity
       real*8 Pbeam, Egamma_max, rootS, eta, kstar
       real*8 recoilMom, thetae
-      real random, randoms(10)  ! random numbers
+      real*8 random, randoms(10)  ! random numbers
       real user(8)
       real random1, random2
+      real*8 grnd, rand1, rand2, rand3
 
       real newvertex(3), newp(3), recoilp(3)
       integer track_num, vertex_num, i, npoints
@@ -74,9 +75,10 @@ c      real*8 E_recoil
       do i = 1, npoints
 c
 c--- define interaction point
-c
-         call grndm(random, 1)
-         z = (compton_width * (2.*random-1.))
+c 
+c         call grndm(random, 1)
+         rand1 = grnd()
+         z = (compton_width * (2.*rand1-1.))
          l  = (z - z0) / costheta
          x  = x0 + l * cosphi * sintheta
          y  = y0 + l * sinphi * sintheta
@@ -148,8 +150,11 @@ c RTJ: here we switch to degrees for call to compton_xsect()
 c         write(90,*)'edotq= ',abs(edotq)
 c         write(90,*)'theta_photon= ',theta_photon*Pi/180.0
 c         write(90,*)'alpha_c= ',1000.0*(Pi-theta_photon*Pi/180.0)
-         call grndm(randoms, 3)
-         theta_cm = acosd((2. * randoms(1)) - 1.) ! cm angle (deg)
+c          call grndm(randoms, 3)
+          rand2 = grnd()
+          rand3 = grnd()
+c         write(6,*) rand1,rand2
+          theta_cm = dacosd((2. * rand2) - 1.) ! cm angle (deg)
          call compton_xsect (Ebeam, Ephoton, theta_photon, theta_gamma,
      $        E_gamma, theta_cm, xsect, pol_xsect)
 c DJG Actually apply the beam and laser polarizations (duh)
@@ -159,7 +164,7 @@ c DJG Actually apply the beam and laser polarizations (duh)
          newvertex(2) = y
          newvertex(3) = z
          call ugsvert(newvertex, 0, 0, 0, 0, vertex_num)
-         phi_gamma   = 360. * randoms(3)
+         phi_gamma   = 360. * rand3
          gx = dsind(theta_gamma) * dcosd(phi_gamma) + ex
          gy = dsind(theta_gamma) * dsind(phi_gamma) + ey
          gz = sqrt(1.0d0 - gx**2 - gy**2)
