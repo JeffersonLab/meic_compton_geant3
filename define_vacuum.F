@@ -116,7 +116,7 @@ c vacuum pipe in straight section
 c vacuum pipe in upstream leg
 
       pars(1) =  0.
-      pars(2) =  3.81 ! 3 inch pipe
+      pars(2) =  3. ! 3 inch pipe
       pars(3) = (chicane_drift + 6.4)/2. !small overlap prevents air leaks
       call ugsvolu ('PIP2', 'TUBE', pipe_mate, pars, 3, volume_b)
       pars(2) =  3.5
@@ -134,16 +134,58 @@ c vacuum pipe in downstream leg - just make the pipe bigger
 
       pars(1) =  0.
       pars(2) =  3.81 ! 3 inch pipe
-      pars(3) = (chicane_drift + 6.4)/2. !small overlap prevents air leaks
+      pars(3) = (0.768*chicane_drift + 6.4)/2. !small overlap prevents air leaks
       call ugsvolu ('PIP3', 'TUBE', pipe_mate, pars, 3, volume_b)
       pars(2) =  3.5 
       call ugsvolu ('PIV3', 'TUBE', pipe_vac, pars, 3, volume_b)
       call gspos ('PIV3', 1, 'PIP3', 0., 0., 0., 0, 'MANY')
-      pars(2) = chicane_drop/2.
-      pars(3) = chicane_length/2. - chicane_drift/2. - dipole_length
+      pars(2) = 171.*chicane_drop/400.
+      pars(3) = chicane_length/2 - 77*chicane_drift/125 - dipole_length
       call gspos ('PIP3', 1, mother, 0., pars(2), pars(3), 6, 'MANY')
       call gsatt ('PIP3', 'COLO', BLACK) ! Change color of the Pipe
       call gsatt ('PIP3', 'SEEN', 1) ! Pipe is visible
+
+c short additon to downstreem pipe after electron detector cylinder addition
+
+      pars(1) =  0.
+      pars(2) =  3.81 ! 3 inch pipe
+      pars(3) = (0.04*chicane_drift + 6.4)/2. !small overlap prevents air leaks
+      call ugsvolu ('PIP4', 'TUBE', pipe_mate, pars, 3, volume_b)
+      pars(2) =  3.5 
+      call ugsvolu ('PIV4', 'TUBE', pipe_vac, pars, 3, volume_b)
+      call gspos ('PIV4', 1, 'PIP4', 0., 0., 0., 0, 'MANY')
+      pars(2) = 4.*chicane_drop/5.
+      pars(3) = chicane_length/2. - chicane_drift/50. - dipole_length
+      call gspos ('PIP4', 1, mother, 0., pars(2), pars(3), 6, 'MANY')
+      call gsatt ('PIP4', 'COLO', BLACK) ! Change color of the Pipe
+      call gsatt ('PIP4', 'SEEN', 1) ! Pipe is visible
+
+c detector cylinder
+
+      pars(1) =  0.
+      pars(2) = (0.096*chicane_drift) ! Radius of detector cylinder
+      pars(3) = 9. ! Detector hight      
+      call ugsvolu ('DetVac', 'TUBE', pipe_vac, pars, 3, volume_b)
+      pars(2) = 3*chicane_drop/4.-1.5
+      pars(3) = chicane_length/2. - 17*chicane_drift/125 - dipole_length
+      call gspos ('DetVac', 1, mother, 0., pars(2), pars(3), 9, 'MANY')
+      call gsatt ('DetVac', 'COLO', BLACK) ! Change color of the Pipe
+      call gsatt ('DetVac', 'SEEN', 1) ! Pipe is visible
+
+c block stray photons from photon detector
+
+c      pars(1) =  0.
+c      pars(2) = (0.3*chicane_drift) ! Radius of detector sheild
+c      pars(3) = 1. ! Detector hight      
+c      call ugsvolu ('Sheild', 'TUBE', pipe_mate, pars, 3, volume_b)
+c      pars(2) = chicane_drop/4.-1.5
+c      pars(3) = chicane_length/2. - 17*chicane_drift/125 - dipole_length
+c      call gspos ('Sheild', 1, mother, 0., pars(2), pars(3), 9, 'MANY')
+c      call gsatt ('Sheild', 'COLO', BLUE) ! Change color of the Pipe
+c      call gsatt ('Sheild', 'SEEN', 1) ! Pipe is visible
+   
+      
+
 
 C DG - this is not what we did in reality
 cc vacuum pipe in downstream leg (enlarged to contain recoil tracks)
