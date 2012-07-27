@@ -1,0 +1,127 @@
+beam_energy=[1]
+mass_elec=[2]
+pi_number=[3]
+hbarc=[4]
+lambda=[5]
+thdet = [6] 
+zdrift = [7] 
+mfield = [8]
+lmag = [9]
+ldet=[10]
+plane=[11]
+planespace=[12]
+edge_strip=[13]
+strip_width=[14]
+nstrips=[15]
+comp_edge=[16]
+strip_shift=[17]
+ 
+ve/cr eb(1) r [beam_energy]
+ve/cr me(1) r [mass_elec]
+ve/cr pi(1) r [pi_number]
+ve/cr hbarc(1) r [hbarc]
+ve/cr lambda(1) r [lambda]
+ve/cr thdet(1) r [thdet]
+ve/cr zdrift(1) r [zdrift]
+ve/cr mfield(1) r [mfield]
+ve/cr lmag(1) r [lmag]
+ve/cr ldet(1) r [ldet]
+ve/cr planen(1) r [plane]
+ve/cr plgap(1) r [planespace]
+ve/cr edgstr(1) r [edge_strip]
+ve/cr strwid(1) r [strip_width]
+ve/cr nstrips(1) r [nstrips]
+ve/cr maxdis(1) r [comp_edge]
+ve/cr strsh(1) r [strip_shift]
+
+*->sh rm distance_to_rho_mfield-[mfield].table
+FORTRAN/FILE 3 distance_to_rho_mfield-[mfield].table
+
+
+mess
+mess ##### Compton Theory - Maximum Compton Distance #####
+mess
+mess ##### Tilted: planes and tilt #######################
+mess
+mess BEAM ENERGY =	[beam_energy]
+mess ELECTRON MASS =	[mass_elec]
+mess PI NUMBER =	[pi_number]
+mess HBARC =		[hbarc]
+mess LAMBDA =		[lambda]
+mess DETECTOR TILT =	[thdet]
+mess Z DRIFT =		[zdrift]
+mess MAG FIELD =	[mfield]
+mess L MAGNET =		[lmag]
+mess L DET =		[ldet]
+mess Plane Number =     [plane]
+mess Plane gap =        [planespace]
+mess Edge strip = 	[edge_strip]
+mess Strip width = 	[strip_width]
+mess Number of strips = [nstrips]
+mess Max Distance =     [comp_edge]
+mess Strip Shift =      [strip_shift]
+
+
+*       sigma const=hbarc*1.0E-15/(2*5.788381E-14*me)
+	sigma const=10/3
+	sigma thdet=thdet*pi/180. 
+	sigma alpha=1.0/137.0
+	sigma re=alpha*hbarc/me
+
+* incident electron (electron gamma-factor (dimensionless))
+        sigma gamma=eb/me
+
+* incident photon  photon energy (GeV)
+        sigma k=2*pi*hbarc/(lambda*1e6)
+
+* undeflected beam parameters 
+	sigma p_beam=sqrt(eb*eb-me*me)
+	sigma r=const*p_beam/mfield
+	sigma theta=asin(lmag/r)
+        mess 'Cheesy Poofs'
+        sigma th=theta*180/pi
+        ve/print th
+	sigma h=r*(1-cos(theta))
+
+*assume beam hits in middle of max strip
+	sigma dpiv=strwid*(edgstr-(nstrips/2)-0.5)+strsh
+	sigma d0=maxdis/1000-dpiv
+
+*outgoing photon// max recoil photon energy (GeV)
+        sigma a=1/(1+4*k*gamma/me) 
+        sigma kmax=4*a*k*gamma*gamma 
+	ve/copy kmax kkk
+	
+      do i=1,1000	
+	sigma p_edge=p_beam-kkk         
+	sigma r_edge=const*p_edge/mfield
+        sigma th_edge=asin(lmag/r_edge)
+	sigma hprime=r_edge*(1-cos(th_edge))
+	sigma ldet2=ldet+(planen-2.5)*plgap*cos(theta)
+
+	sigma a=(hprime-h)+(ldet2+d0*sin(thdet))*(tan(th_edge)-tan(theta))
+	sigma b=1-sin(thdet)*cos(theta)*(tan(th_edge)-tan(theta))
+	sigma d=a*cos(theta)/(b*cos(thdet-theta))
+
+ 	sigma maxdist=d
+
+	sigma rho=kkk/kmax
+	md=maxdist(1)
+	r=rho(1)
+	 if ([r] > 0 .OR. [md] > 0) then
+*	  mess [i] [md] [r]
+	  ve/write maxdist,rho distance_to_rho_mfield-[mfield].table (F9.6,1x,F9.6) ' '
+	 endif
+	sigma kkk=kkk-0.00005
+	ve/del p_edge; ve/del r_edge; ve/del th_edge; ve/del hprime
+	ve/del maxdist; ve/del rho
+      enddo
+  	
+        ve/del eb; ve/del me; ve/del pi; ve/del hbarc; ve/del lambda
+	ve/del zdrift; ve/del mfield; ve/del lmag; ve/del ldet; ve/del thdet
+	ve/del alpha; ve/del re; ve/del gamma; ve/del a; ve/del kmax
+	ve/del p_beam; ve/del r; ve/del h; ve/del theta; ve/del planen;
+	ve/del plgap; ve/del ldet2; ve/del edgstr; ve/del strwid; ve/del d0
+	ve/del maxdis; ve/del dpiv; ve/del nstrips;
+
+      FORTRAN/CLOSE 3
