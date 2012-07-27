@@ -1,0 +1,54 @@
+
+
+ plane=2
+ nstrips=96
+
+*hi/del *
+*ve/del *
+
+bin=[nstrips]+0.5
+histogram/create/1dhisto 10. 'Difference' [nstrips] 0.5 [bin]
+histogram/create/1dhisto 11. 'Difference Prime' [nstrips] 0. [bin]
+histogram/create/1dhisto 20. 'Sum' [nstrips] 0.5 [bin]
+histogram/create/1dhisto 25. 'Number' [nstrips] 0.5 [bin]
+histogram/create/1dhisto 30. 'Asymmetry' [nstrips] 0.5 [bin]
+histogram/create/1dhisto 31. 'Asymmetry Squared' [nstrips] 0.5 [bin]
+
+Histogram/file 0 /home/urbaneg/compton_geant/compton_minus_1mil.hbook 0 -x
+
+Ntuple/Project 10 //LUN1/2.nstrip_pl[plane] apower*wXsect*wLumin.and.Ehit_pl[plane]>0.018E-2 100000 800001
+Ntuple/Project 11 //LUN1/2.nstrip_pl[plane] apower*apower*wXsect*wLumin.and.Ehit_pl[plane]>0.018E-2 100000 800001
+Ntuple/Project 20 //LUN1/2.nstrip_pl[plane] wXsect*wLumin.and.Ehit_pl[plane]>0.018E-2 100000 800001
+Ntuple/Project 25 //LUN1/2.nstrip_pl[plane] Ehit_pl[plane]>0.018E-2 100000 800001
+
+*Ntuple/Project 10 //LUN1/2.nstrip_pl[plane] apower*wXsect*wLumin.and.trigger.f>0
+*Ntuple/Project 11 //LUN1/2.nstrip_pl[plane] apower*apower*wXsect*wLumin.and.trigger.f>0
+*Ntuple/Project 20 //LUN1/2.nstrip_pl[plane] wXsect*wLumin.and.trigger.f>0
+*Ntuple/Project 25 //LUN1/2.nstrip_pl[plane] trigger.f>0
+
+*Ntuple/Project 10 //LUN1/2.nstrip_pl[plane] apower*wXsect*wLumin
+*Ntuple/Project 11 //LUN1/2.nstrip_pl[plane] apower*apower*wXsect*wLumin
+*Ntuple/Project 20 //LUN1/2.nstrip_pl[plane] wXsect*wLumin
+*Ntuple/Project 25 //LUN1/2.nstrip_pl[plane] 
+
+Histogram/operations/divide 10 20 30
+Histogram/operations/divide 11 20 31
+
+ve/cre N([nstrips]) r
+ve/cre sqrtN([nstrips]) r
+ve/cre avgasym([nstrips]) r
+ve/cre avg_asym_sq([nstrips]) r
+ve/cre squared_asym_avg([nstrips]) r
+ve/cre asymvar([nstrips]) r
+ve/cre asymerr([nstrips]) r
+
+histogram/get_vect/contents 25 N
+histogram/get_vect/contents 30 avgasym
+histogram/get_vect/contents 31 squared_asym_avg
+
+vector/operations/vmultiply avgasym avgasym avg_asym_sq
+vector/operations/vsubtract squared_asym_avg avg_asym_sq asymvar
+sigma asymerr=sqrt(asymvar/N)
+
+Histogram/put_vect/errors 30 asymerr
+Histogram/plot 30
