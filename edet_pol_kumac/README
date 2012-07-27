@@ -1,0 +1,41 @@
+This file is meant to describe the operation of the Compton polarimeter electron detector Monte Carlo simulation analysis package located within the directory mc_edet_pol.  This analysis is an adaptation of the kumac used to analyze the real data from the Compton polarimeter electron detector; therefore, are several files in the analysis package that may or may not be necessary to the analysis in its current form but were left in the cvs just in case they are needed later.
+
+
+Below is a description of the primary kumacs and functions used to analyze the data from the Monte Carlo simulation and calculate a measurement of the beam polarization.
+
+mc_edet_pol.kumac:
+This is the primary executable in the analysis package and is to be executed in Paw.  The kumac creates histograms from the data placed in an hbook ntuple by the simulation, calculates the asymmetry within each strip and the error associated with that value.  It the maps the distance of each strip to a value of rho and thus a theoretical asymmetry. Finally, it fits the asymmetry function to the histograms to calculate the polarization and plots the residuals of the fit.
+
+trigger.f:
+This Fortran function is used as a cut on the data when creating histograms. It is meant to replicate the logical trigger present in the actual electron detector.  One can change the trigger threshold within this file.
+
+compton_theory_maxdistance.kumac:
+This kumac is called by mc_edet_pol.kumac to calculate the distance of the maximally scattered electron, the Compton edge. "Distance" is defined as the length from the strip number to the non interacting electron beam in the direction in line the detector itself.  This distance is then dependent on the electron detector tilt and its location along the z-axis.  Therefore, there are various methods of analysis that calculate different values for the maximum distance. There are currently four methods of analysis that can be substituted into this file to analyze data in different ways. They are listed below.
+tilted_compton_theory_maxdistance.kumac:
+This is the best possible analysis.  It accounts for the tilt of the electron detector as well as the longitudinal spacing of the planes.  
+eupl_compton_theory_maxdistance.kumac:
+This analysis accounts for separation of the planes but not their tilt.
+eu_compton_theory_maxdistance.kumac:
+This analysis account for neither the plane separation nor the fact that they are tilted.
+vt_compton_theory_maxdistance.kumac:
+This is the original analysis file. Like eu_compton_theory_maxdistance.kumac, it does not account of plane spacing or tilt.  However, it also does not calculate the bend of the non-interacting beam from the magnetic field and beam energy, but rather passes it as a user input.  This overly constrains the system and produces significant errors in the calculation of the max distance.
+
+compton_theory_distance_to_rho_table.kumac:
+Like compton_theory_maxdistance.kumac, this kumac is called by mc_edet_pol.kumac to map the parameter rho to a distance above the non-interacting beam.  The various methods of determining this map are the same as for compton_theory_maxdistance.kumac. Be sure to copy the correct matching method into this file as you did for compton_theory_maxdistance.kumac. Files are listed below.
+tilted_compton_theory_distance_to_rho_table.kumac:
+This is the best possible analysis.  It accounts for the tilt of the electron detector as well as the longitudinal spacing of the planes.  
+eupl_compton_theory_distance_to_rho_table.kumac:
+This analysis accounts for separation of the planes but not their tilt.
+eu_compton_theory_distance_to_rho_table.kumac:
+This analysis account for neither the plane separation nor the fact that they are tilted.
+vt_compton_theory_distance_to_rho_table.kumac:
+This is the original analysis file. Like eu_compton_theory_distance_to_rho_table.kumac, it does not account of plane spacing or tilt.  However, it also does not calculate the bend of the non-interacting beam from the magnetic field and beam energy, but rather passes it as a user input.  This overly constrains the system and produces significant errors in the calculation of the max distance.
+
+asum_fit.f:
+Function that fits asymmetry curve to asymmetry vs. strip number histogram and calculates the polarization as a fit parameter.
+
+asum_fit_eval.kumac:
+Generates residuals for fit made by asum_fit.f
+
+Other various kumacs exist in the analysis directory to analyze the systematic sensitives of the analysis to various parameters but they are not part of the analysis package that determines polarization.  
+
