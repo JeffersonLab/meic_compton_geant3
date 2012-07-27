@@ -218,7 +218,7 @@ c -June 7, 2003
 *	record /detector/ detector
 *	structure /detector/
 	  real detector_width		! length of active area (cm)
-	  real detector_height	! height of active area (cm)
+	  real detector_height	        ! height of active area (cm)
 	  real detector_thickness	! thickness of detector (um)
 	  real detector_stripwidth	! strip pitch (um)
 	  real detector_stripspace	! space between strips (um)
@@ -226,9 +226,12 @@ c -June 7, 2003
 	  real detector_planespace	! space between planes (cm)
 	  real detector_planenumber	! number of planes
 	  real detector_planeoffset	! vertical shift between planes (um)
- 	  real detector_offset	! offset from beam center (mm)
+ 	  real detector_offset	        ! offset from beam center (mm)
  	  real detector_posoffset	! position offset from the entrance of the 4th dipole (cm)
-          real detector_material      ! material of the electron detector
+          real detector_material        ! material of the electron detector
+	  real detector_rotation        ! rotation of detector to align with beam (degrees)
+          real detector_yroll           ! rotation of detector about the y axis (degrees)
+          real detector_zroll           ! rotation of detector about the z axis (degrees)
 *	end structure
 	common /detector/
      +   detector_width, detector_height, 
@@ -237,7 +240,7 @@ c -June 7, 2003
      +   detector_planespace, detector_planenumber, 
      +   detector_planeoffset,
      +   detector_offset, detector_posoffset,
-     +   detector_material
+     +   detector_material, detector_rotation
 	equivalence (detector,detector_width)
         real detector
 
@@ -308,6 +311,18 @@ c -June 7, 2003
 	equivalence (sources,sources_quantity)
         real sources
 
+*	record /seeds/ seeds
+*	structure /seeds/
+ 	  integer seeds_1		! on/off flag for suppression shield
+ 	  integer seeds_2		! detector type (1-> VU)
+ 	  integer seeds_Iseq		! suppression threshold
+*	end structure			! suppression
+	common /seeds/
+     +   seeds_1, seeds_2, seeds_Iseq
+	equivalence (seeds,seeds_1)
+        real seeds	 
+
+
 *	record /suppression/ suppression
 *	structure /suppression/
  	  real suppression_flag		! on/off flag for suppression shield
@@ -336,29 +351,40 @@ c -June 7, 2003
 	equivalence (event_type,event_type_brem)
 	integer event_type
 
-	integer seed
+*	integer seeds_1, seeds_2, seeds_Iseq
 	integer total_triggers
 	common /user/ total_luminosity, 
 *    1	event_weight, beam, chicane, laser, detector, compton, dipole,
 *    2	foil, hpge, sources, suppression, event_type, halo
-     3	seed,
+*    3	seeds_1, seeds_2, seeds_Iseq,
      4	total_triggers
 
-        integer nht,plane,calc_strip
-        real Egam_dep,Ehit,Ee_dep,Eparticle,
-     1        wXSect,wLumin,apower,vertx,vertp,
-     2	      ereal,h,E_recoil,Einc,egmax
-        common /ntuple/Egam_dep,nht,plane(400),Ehit(400),
-     1           Ee_dep,vertx(3),vertp(3),Eparticle(100),
-     2           wXSect,wLumin,apower,ereal,calc_strip,h,
-     3           E_recoil,Einc,egmax
-	character*300 chform
+        integer nht,nht_pl1,nht_pl2,nht_pl3,nht_pl4
+     	
+        real Egam_dep,nstrip_pl1,nstrip_pl2,
+     1        nstrip_pl3,nstrip_pl4,Ehit,Ee_dep,Eparticle,
+     2        wXSect,wLumin,apower,vertx,vertp,
+     3	      gam_rho,E_recoil,E_beam,egmax,
+     4	      Ehit_pl1, Ehit_pl2, Ehit_pl3, Ehit_pl4
+        common /ntuple/Egam_dep,nht,nht_pl1,nht_pl2,
+     1           nht_pl3,nht_pl4,
+     2		 nstrip_pl1(92),nstrip_pl2(92),
+     3           nstrip_pl3(92),nstrip_pl4(92),
+     4		 Ehit(400),Ehit_pl1(92),Ehit_pl2(92),
+     5		 Ehit_pl3(92),Ehit_pl4(92),
+     6           Ee_dep,vertx(3),vertp(3),Eparticle(100),
+     7           wXSect,wLumin,apower,gam_rho,
+     8           E_recoil,E_beam,egmax
+	character*700 chform
 	parameter (chform='Egam_dep:R,nht[0,400]:I,' //
-     1     	            'plane(nht):I,Ehit(nht):R,' //
-     2                      'Ee_dep:R,' //
-     3                      'vertx(3):R,vertp(3):R,' //
-     4                      'Eparticle(100):R,' //
-     5                      'wXSect:R,wLumin:R,' //
-     6			    'apower:R,ereal:R,calc_strip:I,h:R,'//
-     7                      'E_recoil:R,Einc:R,egmax:R')
+     1 		    'nht_pl1[0,92]:I,nht_pl2[0,92]:I,' //
+     2		    'nht_pl3[0,92]:I,nht_pl4[0,92]:I,' //
+     3		    'nstrip_pl1(nht_pl1):R,nstrip_pl2(nht_pl2):R,' //
+     4   	    'nstrip_pl3(nht_pl3):R,nstrip_pl4(nht_pl4):R,' //
+     4              'Ehit(nht):R,' //
+     5              'Ehit_pl1(nht_pl1):R,Ehit_pl2(nht_pl2):R,' //
+     6		    'Ehit_pl3(nht_pl3):R,Ehit_pl4(nht_pl4):R,' //
+     7              'Ee_dep:R,vertx(3):R,vertp(3):R,' //
+     8              'Eparticle(100):R,wXSect:R,wLumin:R,' //
+     9              'apower:R,gam_rho:R,E_recoil:R,E_beam:R,egmax:R')
             
