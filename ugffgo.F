@@ -80,7 +80,7 @@ c Define the laser beam input card
 
 c Define detector card (for recoil electron)
 
-      call ffkey('DETECTOR', detector, 12, 'REAL')
+      call ffkey('DETECTOR', detector, 15, 'REAL')
       detector_width		= 2.1      ! width of active area (cm)
       detector_height		= 2.1      ! height of active area (cm)
       detector_thickness	= 500.     ! thickness of detector (um)
@@ -93,6 +93,9 @@ c Define detector card (for recoil electron)
       detector_offset		= 5.0      ! offset from beam center (cm)
       detector_posoffset	= 10.16    ! position in front of 4th dipole (cm)
       detector_material         = DIAMOND_MATE
+      detector_rotation		= 10 	   ! rotation of detector to align with beam (degree)
+      detector_yroll		= 0.0      ! roll of detector about the y axis (degrees)
+      detector_zroll		= 0.0      ! roll of detector about the z axis (degrees)
 
 c Define backscatter card
 
@@ -135,6 +138,14 @@ c Define the radioactive source card
       call ffkey ('SOURCES', sources, 20, 'REAL') ! define sources card
       sources_quantity = 0.     ! # of entries
         
+c Define the random number generator seed card
+
+      call ffkey ('SEEDS', seeds, 3, 'INTEGER') !Define seeds for random number generator
+      seeds_1 = 2465761579
+      seeds_2 = 564186545
+      seeds_Iseq = 42
+
+
 c Define the generator  input card
 
       call ffkey('TYPE', event_type, 5, 'INTEGER') ! define event type card
@@ -241,7 +252,7 @@ C     So B_MC = B_map*Lmap/Lideal = B_map * 124.58/125.0
       write(98,*) ' Dipole current ', dipole_current, ' A'
       write(98,*) ' Dipole field ', dipole_field, ' kG'
       
-c     seed = 1122334455			! some initial seed
-      seed = 1104353453
       
+      call sgrnd(seeds_1)
+
       end
