@@ -16,12 +16,12 @@ OBJ = uglast.o uginit.o ugmate.o ugeom.o ugstmed.o ugsvolu.o ugffgo.o \
 	gukine.o ugsvert.o ugskine.o gustep.o histo_init.o \
 	do_compton.o compton.o gufld.o gudigi.o genbeam.o genhalo.o \
 	define_cave.o define_vacuum.o define_lattice.o define_detector.o \
-	trig.o granor.o
+	trig.o granor.o mt19937.o
 
 SOURCES = compton.F control.in granor.F define_cave.F define_detector.F \
 	define_lattice.F define_vacuum.F do_compton.F fort.4 \
 	genbeam.F genhalo.F gudigi.F gufld.F gukine.F gustep.F \
-	gxcs.F histo_init.F main.F \
+	gxcs.F histo_init.F main.F mt 19937.F\
 	Makefile materials.database README \
 	params.inc testcompton.f trig.F trig.inc ugeom.F \
 	ugeom.inc ugffgo.F uginit.F uglast.F ugmate.F \
