@@ -1,0 +1,85 @@
+ve/del *
+
+ve/cr eb(1) r 1.159
+ve/cr me(1) r 0.000511
+ve/cr pi(1) r 3.141592
+ve/cr hbarc(1) r 0.197
+ve/cr lambda(1) r 532.0
+ve/cr thbend(1) r 10.3
+ve/cr zdrift(1) r 2.275
+ve/cr mfield(1) r 0.55264
+ve/cr lmag(1) r 1.25
+ve/cr ldet(1) r 1.805
+
+
+       
+
+* incident electron (electron gamma-factor (dimensionless))
+        sigma gamma=eb/me
+
+* incident photon  photon energy (GeV)
+        sigma k=2*pi*hbarc/(lambda*1e6)
+
+*outgoing photon// max recoil photon energy (GeV)
+
+        sigma a=1/(1+4*k*gamma/me) 
+        sigma kmax=4*a*k*gamma*gamma 
+        sigma p_beam=sqrt(eb*eb-me*me)
+        sigma r=(p_beam/(mfield))*hbarc*1.0E-15/(2*5.788381E-14*me) 
+	sigma th=asin(lmag/r)
+        ve/pr th
+        r=r(1)
+        lmag=lmag(1)
+        pi=pi(1)
+
+	function/fun1 100 [r]*(1-cos(x*[pi]/180)) 100 10.1 10.5
+	function/fun1 200 ([r]*tan(x*[pi]/180)-[lmag])/tan(x*[pi]/180) 100 10.1 10.5 s
+
+
+
+*true dependance of h on theta
+
+
+	sigma const=10/3
+	sigma thbend=thbend*pi/180. 
+
+
+* incident electron (electron gamma-factor (dimensionless))
+        sigma gamma=eb/me
+
+* incident photon  photon energy (GeV)
+        sigma k=2*pi*hbarc/(lambda*1e6)
+
+*outgoing photon// max recoil photon energy (GeV)
+        sigma a=1/(1+4*k*gamma/me) 
+        sigma kmax=4*a*k*gamma*gamma 
+
+*undeflected beam
+	sigma p_beam=sqrt(eb*eb-me*me)
+*        sigma mfield=10*p_beam*sin(theta)/(3*lmag)
+	sigma r=const*p_beam/mfield
+	sigma theta=asin(lmag/r)
+	sigma h=r*(1-cos(theta))
+        r=r(1)
+        theta=theta(1)
+
+
+        function/fun1 300 (1-cos(x*[pi]/180))*[lmag]/sin(x*[pi]/180) 100 10.1 10.5 s
+
+         hplot/atitle 'Hard Programmed Angle (degrees)' 'H (m)'
+
+
+set txci 1
+string7 = True Angle = 10.3 Degrees
+graph/prim/text 10.22 0.04 [string7] ! ! !
+
+string7 = Dotted Line -- True Dependance on Theta
+graph/prim/text 10.22 0.035 [string7] ! ! !
+
+string9 = Solid Line -- h=r*(1-cos(theta))
+graph/prim/text 10.22 0.03 [string9] ! ! !
+
+string2 = Dashed Line -- h=(r*tan(theta)-lmag)/tan(theta)
+graph/prim/text 10.22 0.025 [string2] ! ! !
+
+
