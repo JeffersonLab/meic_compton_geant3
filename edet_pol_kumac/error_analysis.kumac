@@ -1,0 +1,708 @@
+*-> What Plane Number to Analyze
+ plane=1
+ planespace=0.01
+ edge_strip=58
+ nstrips=96
+strnum=47
+
+hi/del *
+ve/del *
+
+zone 1 2
+
+bin=[nstrips]+0.5
+histogram/create/1dhisto 10. 'PosSum' [nstrips] 0.5 [bin]
+histogram/create/1dhisto 15. 'PWeightSq' [nstrips] 0.5 [bin]
+histogram/create/1dhisto 20. 'PosNumber' [nstrips] 0.5 [bin]
+histogram/create/1dhisto 25. 'PosYield' [nstrips] 0.5 [bin]
+histogram/create/1dhisto 30. 'PosYield_Errors' [nstrips] 0.5 [bin]
+
+Histogram/file 1 /home/urbaneg/compton_geant/compton_1mil_1.hbook 0 -x
+Ntuple/Project 10 //LUN1/2.nstrip_pl[plane] (1+apower)*wXsect*wLumin
+Ntuple/Project 20 //LUN1/2.nstrip_pl[plane] 1
+Ntuple/Project 15 //LUN1/2.nstrip_pl[plane] (1+apower)*(1+apower)*wXsect*wXsect*wLumin*wLumin
+Fortran/Close 1
+
+Histogram/file 2 /home/urbaneg/compton_geant/compton_1mil_2.hbook 0 -x
+Ntuple/Project 10 //LUN2/2.nstrip_pl[plane] (1+apower)*wXsect*wLumin
+Ntuple/Project 20 //LUN2/2.nstrip_pl[plane] 1
+Ntuple/Project 15 //LUN2/2.nstrip_pl[plane] (1+apower)*(1+apower)*wXsect*wXsect*wLumin*wLumin
+Fortran/Close 2
+
+Histogram/file 3 /home/urbaneg/compton_geant/compton_1mil_3.hbook 0 -x
+Ntuple/Project 10 //LUN3/2.nstrip_pl[plane] (1+apower)*wXsect*wLumin
+Ntuple/Project 20 //LUN3/2.nstrip_pl[plane] 1
+Ntuple/Project 15 //LUN3/2.nstrip_pl[plane] (1+apower)*(1+apower)*wXsect*wXsect*wLumin*wLumin
+Fortran/Close 3
+
+Histogram/file 4 /home/urbaneg/compton_geant/compton_1mil_4.hbook 0 -x
+Ntuple/Project 10 //LUN4/2.nstrip_pl[plane] (1+apower)*wXsect*wLumin
+Ntuple/Project 20 //LUN4/2.nstrip_pl[plane] 1
+Ntuple/Project 15 //LUN4/2.nstrip_pl[plane] (1+apower)*(1+apower)*wXsect*wXsect*wLumin*wLumin
+Fortran/Close 4
+
+Histogram/file 1 /home/urbaneg/compton_geant/compton_1mil_5.hbook 0 -x
+Ntuple/Project 10 //LUN1/2.nstrip_pl[plane] (1+apower)*wXsect*wLumin
+Ntuple/Project 20 //LUN1/2.nstrip_pl[plane] 1
+Ntuple/Project 15 //LUN1/2.nstrip_pl[plane] (1+apower)*(1+apower)*wXsect*wXsect*wLumin*wLumin
+Fortran/Close 1
+
+Histogram/file 2 /home/urbaneg/compton_geant/compton_1mil_6.hbook 0 -x
+Ntuple/Project 10 //LUN2/2.nstrip_pl[plane] (1+apower)*wXsect*wLumin
+Ntuple/Project 20 //LUN2/2.nstrip_pl[plane] 1
+Ntuple/Project 15 //LUN2/2.nstrip_pl[plane] (1+apower)*(1+apower)*wXsect*wXsect*wLumin*wLumin
+Fortran/Close 2
+
+
+Histogram/operations/divide 10 20 25
+
+ve/cre PN([nstrips]) r
+ve/cre PsqrtN([nstrips]) r
+ve/cre PYield([nstrips]) r
+ve/cre PError([nstrips]) r
+ve/cre Pwsq([nstrips]) r
+
+histogram/get_vect/contents 20 PN
+histogram/get_vect/contents 25 PYield
+histogram/get_vect/contents 15 Pwsq
+
+sigma PError=sqrt(Pwsq)/PN
+
+
+*sigma PsqrtN=sqrt(PN)
+*sigma PError=PYield/PsqrtN
+*sigma PError=PYield/sqrt(PN)
+
+Histogram/put_vect/contents 30 PError
+Histogram/plot 30(0:[edge_strip])
+
+Wait
+
+
+
+
+histogram/create/1dhisto 11. 'NegSum' [nstrips] 0.5 [bin]
+histogram/create/1dhisto 16. 'NWeightSq' [nstrips] 0.5 [bin]
+histogram/create/1dhisto 21. 'NegNumber' [nstrips] 0.5 [bin]
+histogram/create/1dhisto 26. 'NegYield' [nstrips] 0.5 [bin]
+histogram/create/1dhisto 31. 'NegYield_Errors' [nstrips] 0.5 [bin]
+
+Histogram/file 1 /home/urbaneg/compton_geant/compton_1mil_7.hbook 0 -x
+Ntuple/Project 11 //LUN1/2.nstrip_pl[plane] (1-apower)*wXsect*wLumin
+Ntuple/Project 21 //LUN1/2.nstrip_pl[plane] 1
+Ntuple/Project 16 //LUN1/2.nstrip_pl[plane] (1-apower)*(1-apower)*wXsect*wXsect*wLumin*wLumin
+Fortran/Close 1
+
+Histogram/file 2 /home/urbaneg/compton_geant/compton_1mil_8.hbook 0 -x
+Ntuple/Project 11 //LUN2/2.nstrip_pl[plane] (1-apower)*wXsect*wLumin
+Ntuple/Project 21 //LUN2/2.nstrip_pl[plane] 1
+Ntuple/Project 16 //LUN2/2.nstrip_pl[plane] (1-apower)*(1-apower)*wXsect*wXsect*wLumin*wLumin
+Fortran/Close 2
+
+Histogram/file 3 /home/urbaneg/compton_geant/compton_1mil_9.hbook 0 -x
+Ntuple/Project 11 //LUN3/2.nstrip_pl[plane] (1-apower)*wXsect*wLumin
+Ntuple/Project 21 //LUN3/2.nstrip_pl[plane] 1
+Ntuple/Project 16 //LUN3/2.nstrip_pl[plane] (1-apower)*(1-apower)*wXsect*wXsect*wLumin*wLumin
+Fortran/Close 3
+
+Histogram/file 4 /home/urbaneg/compton_geant/compton_1mil_10.hbook 0 -x
+Ntuple/Project 11 //LUN4/2.nstrip_pl[plane] (1-apower)*wXsect*wLumin
+Ntuple/Project 21 //LUN4/2.nstrip_pl[plane] 1
+Ntuple/Project 16 //LUN4/2.nstrip_pl[plane] (1-apower)*(1-apower)*wXsect*wXsect*wLumin*wLumin
+Fortran/Close 4
+
+Histogram/file 1 /home/urbaneg/compton_geant/compton_1mil_11.hbook 0 -x
+Ntuple/Project 11 //LUN1/2.nstrip_pl[plane] (1-apower)*wXsect*wLumin
+Ntuple/Project 21 //LUN1/2.nstrip_pl[plane] 1
+Ntuple/Project 16 //LUN1/2.nstrip_pl[plane] (1-apower)*(1-apower)*wXsect*wXsect*wLumin*wLumin
+Fortran/Close 1
+
+Histogram/file 2 /home/urbaneg/compton_geant/compton_1mil_12.hbook 0 -x
+Ntuple/Project 11 //LUN2/2.nstrip_pl[plane] (1-apower)*wXsect*wLumin
+Ntuple/Project 21 //LUN2/2.nstrip_pl[plane] 1
+Ntuple/Project 16 //LUN2/2.nstrip_pl[plane] (1-apower)*(1-apower)*wXsect*wXsect*wLumin*wLumin
+Fortran/Close 2
+
+
+Histogram/operations/divide 11 21 26.
+
+ve/cre NN([nstrips]) r
+ve/cre NsqrtN([nstrips]) r
+ve/cre NYield([nstrips]) r
+ve/cre NError([nstrips]) r
+ve/cre Nwsq([nstrips]) r
+
+histogram/get_vect/contents 21 NN
+histogram/get_vect/contents 26 NYield
+histogram/get_vect/contents 16 Nwsq
+
+sigma NError=sqrt(Nwsq)/NN
+
+
+*sigma NsqrtN=sqrt(NN)
+*sigma NError=NYield/NsqrtN
+*sigma NError=NYield/sqrt(NN)
+
+Histogram/put_vect/contents 31 NError
+Histogram/plot 31(0:[edge_strip])
+
+wait
+
+zone 1
+
+ve/cre ErrorA
+ve/cre first
+ve/cre second
+histogram/create/1dhisto 40. 'Asymmetry Error' [nstrips] 0.5 [bin]
+
+sigma first=2*NYield*PError/((NYield+PYield)**2)
+sigma second=2*PYield*NError/((NYield+PYield)**2)
+sigma ErrorA=sqrt((first**2)+(second**2))
+
+Histogram/put_vect/contents 40 ErrorA
+Histogram/plot 40(0:[edge_strip])
+
+wait
+
+sigma Asym=(PYield-NYield)/(PYield+NYield)
+
+histogram/create/1dhisto 50. 'Asym' [nstrips] 0.5 [bin]
+Histogram/put_vect/contents 50. Asym
+Hist/put_vect/errors 50 ErrorA
+
+*ve/print Asym(3)
+*ve/print ErrorA(3)
+
+hist/plot 50(0:[edge_strip])
+
+
+Fortran/Close 3
+Fortran/Close 4
+wait
+
+*code from mc_edet_pol
+
+
+exe hallc#setup
+ 
+
+****************
+**** INPUTS ****
+****************
+
+
+*-> Location of Simulation Ntuple
+ source_file=/home/urbaneg/compton_geant/compton.hbook
+
+
+*-> Theory
+beam_energy=1.159
+mass_elec=0.000511
+pi_number=3.141592
+hbarc=0.197
+lambda=532.0
+thetabend = 10.131
+zdrift = 2.275 
+mfield = 0.544
+lmag = 1.25
+ldet=1.95-30.5/100
+strip_width=0.0002*96/[nstrips]
+
+
+*-> Rho
+rho_exctraction=1
+method_rho=2
+rho_parametrization=0
+if ([rho_exctraction] = 0) then
+ dtor1=0
+ dtor2=0
+ dtor3=0
+ dtor4=0
+endif
+*1 extraction
+*2 fit from table
+* syst. due to the size of the strip
+* will be based on the correct mfield
+* which I got from parametrization !!!
+
+*-> # of Fit Parameters
+
+fitparam=2
+ 
+
+if ([fitparam] = 1) then 
+  if ([plane] = 1) then
+     param2=
+  endif  
+  if ([plane] = 2) then
+     param2=
+  endif  
+  if ([plane] = 3) then
+    param2=
+  endif  
+  if ([plane] = 4) then
+    param2=
+  endif
+endif
+if ([fitparam] = 2) then
+ param2=0
+endif
+
+
+
+
+********************************* 
+**** GET MAX COMPTON DISTANE ****
+*********************************
+ 
+exe compton_theory_maxdistance.kumac _
+[beam_energy] _
+[mass_elec] _
+[pi_number] _
+[hbarc] _
+[lambda] _
+[thetabend] _
+[zdrift] _
+[mfield] _
+[lmag] _
+[ldet] _
+[plane] _
+[planespace] _
+[edge_strip] _
+[nstrips] _
+[strip_width]
+
+sigma maxdist=maxdist*1000
+maxd=maxdist(1)
+comp_edge=maxdist(1)
+*comp_edge=[comp_edge]+0.09
+ve/del maxdist
+
+
+mess
+mess For THOSE SETTNGS MAX. DEVIATION (COMPTON EDGE) 
+mess A) THEORY = 	[maxd]
+mess B) EXPERIMENT =	[comp_edge]
+mess
+
+wait
+
+if ([fitparam] = 1) then
+ mess You are using FIXED 2nd parameter = [param2]
+endif
+if ([fitparam] = 2) then
+ mess You are using 2(two) FREE parameters
+endif
+
+mess
+
+**************************
+*** CALCULATE DISTANCE ***
+**************************
+ mess
+ mess Calculating Distance for each Strip .... Start
+ 
+ ve/cr dist([edge_strip]) r
+ mess Comton Edge Distance = [comp_edge] 
+ mess Compton Edge Strip = [edge_strip] 
+
+ if ([fitparam] = 1) then
+ mess Second Parameter is = [param2] 
+ endif
+ if ([fitparam] = 2) then
+ mess Two Free Parameters
+ endif
+
+  do b=1,[edge_strip]
+   if ([fitparam] = 1) then 
+    distance=[comp_edge]-[strip_width]*1000*([edge_strip]-[b])*[param2]
+   endif 
+   if ([fitparam] = 2) then 
+    distance=[comp_edge]-[strip_width]*1000*([edge_strip]-[b])
+   endif 
+  mess [b] [distance]
+*->   ve/inp dist([b]) [distance]
+  enddo
+  mess Calculating Distance for each Strip .... Done
+ 
+ 
+*******************************
+*** CONVERT DISTANCE TO RHO ***
+*******************************
+
+mess
+mess Convert Distance to Row .... Start 
+
+if ([rho_exctraction] = 1) then
+mess Rho from Exctraction ...
+
+filexist=$FEXIST(distance_to_rho_mfield-[mfield].table)  
+
+*if ([filexist] = 1) then
+* mess
+* mess TABLE=distance_to_rho_mfield-[mfield].table EXISTS
+* mess
+*endif
+
+*if ([filexist] = 0) then
+ mess
+ mess TABLE=distance_to_rho_mfield-[mfield].table
+ mess Does Not Exists, Creating ...
+ mess
+exe compton_theory_distance_to_rho_table.kumac _
+[beam_energy] _
+[mass_elec] _
+[pi_number] _
+[hbarc] _
+[lambda] _
+[thetabend] _
+[zdrift] _
+[mfield] _
+[lmag] _
+[ldet] _
+[plane] _
+[planespace] _
+[edge_strip] _
+[strip_width] _
+[nstrips] _
+[comp_edge]
+*endif
+  
+* Polychenie Rho iz Tablici (Exctract) *
+if ([method_rho] = 1) then 
+ ve/cr rho([edge_strip])
+ mess Get Rho from Distance ......... Method-1
+  do getrho=1,[edge_strip]
+   select=1
+   exe compton_theory_distance_to_rho_extra.kumac [mfield] [getrho] [select]
+  enddo   
+ ve/del tdist 
+ ve/del trho
+endif
+
+* Polychenie Rho iz Tablici (fit) *
+* eti porametri nezavisimo ot fita I ispolzyt v konecnom
+* fite polarizacii
+ ve/read dt,rt distance_to_rho_mfield-[mfield].table
+ tn=$vdim(dt, 1)
+ sigma dt=dt*1000
+ ve/cr xxx([tn]) r [tn]*0.000001
+ ve/cr par(4) r
+ ve/cr errpar(4) r
+ ve/fit dt rt xxx p3 0 4 par ? ? ? errpar
+ dtor1=par(1)
+ dtor2=par(2)
+ dtor3=par(3)
+ dtor4=par(4)
+ ve/plot rt%dt
+ wait
+ ve/del dt; ve/del rt; ve/del xxx; ve/del par; ve/del errpar
+
+if ([method_rho] = 2) then
+ mess Get Rho from Distance ......... Method-2
+ mess
+ sigma rho=([dtor1])+([dtor2])*dist+([dtor3])*dist*dist+([dtor4])*dist*dist*dist
+ mess P1 for RHO = [dtor1]
+ mess P2 for RHO = [dtor2]
+ mess P3 for RHO = [dtor3]
+ mess P4 for RHO = [dtor4]
+endif 
+ 
+endif 
+  
+mess Convert Distance to Row .... Done
+ 
+******************************************
+*** CALCULATE THEORY ASYMMETRY ***********
+******************************************
+
+mess
+mess Calculating THEORY ASYMMETRY ...
+
+exe get_cross_as.kumac _
+[beam_energy] _
+[mass_elec] _
+[pi_number] _
+[hbarc] _
+[lambda]
+
+ 
+
+**********************************************
+*** CALCULATE POLARIZATION FROM LINEAR FIT ***
+********************************************** 
+**********************************************
+*** CALCULATE POLARIZATION FROM LINEAR FIT ***
+********************************************** 
+**********************************************
+*** CALCULATE POLARIZATION FROM LINEAR FIT ***
+********************************************** 
+ 
+mess 
+mess Calculate Polarization from Linear Fit .... Start
+ 
+exe exp_polarization_linear.kumac _
+[good] _
+[edge_strip] _
+[run] _
+[tim] _
+
+ve/cr rhot(100) r
+ve/cr sigt(100) r
+ve/cr asumt(100) r
+ve/read rhot,sigt,asumt compton.out
+
+zone 1 2 2
+
+GRAPHICS/ATTRIBUTES/COLOR_TABLE 151 0.5 0.5 0.5
+set faci 151
+SET FAIS 1
+set lwid 7
+graph 100 rhot(1:100) asumt(1:100) 'l'
+SET FAIS
+set lwid
+  
+mess
+mess Calculate Polarization from Linear Fit .... Done
+mess
+
+
+
+**************************************************
+*** CALCULATE POLARIZATION FROM TWO PARAMs FIT ***
+************************************************** 
+**************************************************
+*** CALCULATE POLARIZATION FROM TWO PARAMs FIT ***
+************************************************** 
+**************************************************
+*** CALCULATE POLARIZATION FROM TWO PARAMs FIT ***
+************************************************** 
+ 
+mess 
+mess Calculate Polarization from Two Parameters Fit .... Start
+
+
+if ([fitparam] = 2) then 
+ sigma ns=comedge-([comp_edge]-distg)/([strip_width]*1000)
+endif
+
+if ([fitparam] = 1) then 
+ sigma ns=comedge-([comp_edge]-distg)/([strip_width]*1000*[param2])
+endif 
+  
+ 
+*2) Plot Asummetry vs Strip Number
+
+null -5 [edge_strip] -0.07 0.15
+
+set xlab 2.2
+set ylab 1.2
+set asiz 0.7
+atitl ' ' 'Asymmetry'
+atitl 'Strip Number'
+set plci 1
+line -5 0 100 0
+
+
+
+ve/cr abcde([good]) r [good]*0.0000001 
+set pmci 2
+graph/hplot/err ns ratg abcde erg 100 20 0.25
+set pmci 1
+graph/hplot/err ns ratg abcde erg 100 24 0.25
+ve/del abcde
+
+
+*3) FIT
+ve/del par
+ve/del errpar
+
+*mess comp_edge=[comp_edge]
+*mess edge_strip=[edge_strip]
+*mess param2=[param2] 
+*mess fitparam=[fitparam] 
+*mess beam_energy=[beam_energy]
+*mess mass_elec=[mass_elec]
+*mess pi_number=[pi_number]
+*mess hbarc=[hbarc]
+*mess lambda=[lambda] 
+*mess dtor1=[dtor1]
+*mess dtor2=[dtor2]
+*mess dtor3=[dtor3]
+*mess dtor4=[dtor4]
+*mess strip_width=[strip_width]
+*mess nstrips=[nstrips]
+
+ve/inp ?(1:1) [comp_edge]
+ve/inp ?(2:2) [edge_strip]
+ve/inp ?(3:3) [param2] 
+ve/inp ?(4:4) [fitparam] 
+ve/inp ?(5:5) [beam_energy]
+ve/inp ?(6:6) [mass_elec]
+ve/inp ?(7:7) [pi_number]
+ve/inp ?(8:8) [hbarc]
+ve/inp ?(9:9) [lambda] 
+ve/inp ?(10:10) [dtor1]
+ve/inp ?(11:11) [dtor2]
+ve/inp ?(12:12) [dtor3]
+ve/inp ?(13:13) [dtor4]
+ve/inp ?(14:14) [nstrips]
+ve/inp ?(15:15) [strip_width]
+ 
+if ([fitparam] = 2) then
+ ve/cr par(2) r 1 1
+ ve/cr errpar(2) r 0 0 
+endif
+if ([fitparam] = 1) then
+ ve/cr par(1)
+ ve/cr errpar(1)
+endif
+
+ve/cr chi2(1) r
+*null -5 60 -0.04 0.05
+*hi/plo 30 s
+hist/fit 50(1:[edge_strip]) asum_fit.f s,e [fitparam] par ! ! ! errpar 
+
+Call chiq.f
+x2=chi2(1)
+
+
+*4) Print on the Screen 
+set txci 1
+string1 = Run (Laser ON/OFF) = [run]
+graph/prim/text 0 0.135 [string1] ! ! !
+
+pol2par=par(1) 
+epol2par=errpar(1) 
+
+pol2par=[pol2par]*100
+epol2par=[epol2par]*100
+
+if ([fitparam] = 2) then 
+ pos=par(2) 
+ epos=errpar(2) 
+endif
+if ([fitparam] = 1) then 
+ pos=[param2]
+ epos=0.000
+endif
+ 
+sss=syst(1)
+sssf=$FORMAT([sss],F6.4)
+
+pol2par=$FORMAT([pol2par],F6.4)
+epol2par=$FORMAT([epol2par],F6.4)
+set txci 2
+string7 = Pol. = [pol2par]"Y# +/- [epol2par]"Y#
+graph/prim/text 0 0.105 [string7] ! ! !
+set txci 1
+
+pol2par=$FORMAT([pol2par],F6.4)
+epol2par=$FORMAT([epol2par],F6.4)
+set txci 2
+string7 = Pol. = [pol2par]"Y# +/- [epol2par]"Y#
+graph/prim/text 0 0.105 [string7] ! ! !
+set txci 1
+
+pos=$FORMAT([pos],F6.4)
+epos=$FORMAT([epos],F6.4)
+set txci 2
+string71 = Pos. = [pos] +/- [epos]
+graph/prim/text 0 0.090 [string71] ! ! !
+set txci 1
+
+set txci 2
+x2f=$FORMAT([x2],F6.4)
+string77 = [v]^2! of the Fit = [x2f]
+graph/prim/text 0 0.075 [string77] ! ! !
+set txci 1
+  
+set txci 4
+string8 = Theory(Fit)
+graph/prim/text 0 0.060 [string8] ! ! !
+set txci 1  
+
+set lwid 5  
+line 15 0.063 22 0.063
+set lwid
+  
+set hwid 7
+set hcol 3
+set ltyp 1
+ fun/plo asum_fit.f -5 [edge_strip] s,c 
+set hwid  
+set hcol 1 
+  
+if ([fitparam] = 1) then 
+ ve/cr fpar(2) r
+ ve/inp fpar(1:1) [param2] 
+ ve/inp fpar(2:2) 0  
+endif
+ 
+if ([fitparam] = 2) then 
+ ve/cr fpar(2) r
+ ve/inp fpar(1:1) par(2)
+ ve/inp fpar(2:2) errpar(2)
+ param2=par(2)
+endif
+
+      
+     if ([pol2par] > 0) then
+      ve/cr posneg(1) r 1
+     endif 
+     if ([pol2par] < 0) then
+      ve/cr posneg(1) r -1
+     endif 
+
+mess 
+mess Calculate Polarization from Two Parameters Fit .... Done
+mess
+
+zone 1 2 1 s
+
+*plot residuals->actual graphing at end of script for visual purposes
+
+ve/cr residuals([nstrips]) r 
+ve/cr values([nstrips]) r
+ve/cr fitval([nstrips]) r
+ve/cr strn([nstrips]) r
+
+pol=par(1)
+effwid=par(2)
+
+histogram/get_vect/contents 50 values
+
+*evaluate fit funtion
+ 
+do i=1, [nstrips]
+exe asum_fit_eval.kumac _
+[comp_edge] _
+[edge_strip] _
+[param2] _
+[fitparam] _
+[beam_energy] _
+[mass_elec] _
+[pi_number] _
+[hbarc] _
+[lambda] _
+[ldet] _
+[dtor1] _
+[dtor2] _
+[dtor3] _
+[dtor4] _
+[pol] _
+[effwid] _
+[strip_width] _
+[i]    
+ve/inp fitval([i]) asumfit
+ve/inp strn([i]) [i]
+enddo
+
+vector/operations/vsubtract values fitval residuals
+
+
+hplot/errors strn(1:[edge_strip]) residuals ErrorA ErrorA [edge_strip] ! 0.1 W,1,0
+
+zone 1 1 1 s
+
+
