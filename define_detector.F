@@ -48,7 +48,7 @@ c
       data orig/0/
       data fact/1e9/
       real pars(9)
-      integer edetpos, istrip,nstrip,iplane,nplane
+      integer edetpos, istrip,nstrip,ngap,iplane,nplane, stripID
       real thetab,le
       real detector_position,sensitive_height,sensitive_thick,vshift
       logical QWEAK
@@ -176,43 +176,78 @@ c         write(98,*)'zdet= ',pars(3),' cm'
      2                 STMIN, 0, 0)
 
          pars(1) = 0.5 * detector_width
-         pars(2) = 0.5 * detector_height
+         pars(2) = 0.5 * detector_stripwidth * 96/nstrip
          pars(3) = 0.5 * detector_thickness 
          call ugsvolu('ELED','BOX ',recoil_mate, pars, 3,volume_num)
-         pars(1) = 0.5 * detector_width
-         pars(2) = 0.5 * detector_stripspace	
-         pars(3) = 0.5 * detector_thickness
-         call ugsvolu('SPAC','BOX ', recoil_vac, pars,3,volume_num)
-         istrip = 0
-         do istrip=1,nstrip           
-            pars(1) = 0.0
-            pars(2) = -0.5*detector_height 
-     >                + istrip * detector_stripwidth 
-     >                + (istrip-0.5) * detector_stripspace
-            pars(3) = 0.0
-            call gspos ('SPAC',istrip,'ELED',pars(1),pars(2),pars(3),
-     1                  0,'ONLY')
-         enddo
-
+         
          do iplane=1,nplane
             if (iplane .eq. 2 .or. iplane .eq. 4) then
                vshift = detector_planeoffset
             else
                vshift = 0.0
             endif
-            pars(1) = 0.0
-            pars(2) = vshift
-            pars(3) = -0.5*sensitive_thick + 0.5 * detector_thickness
-     >                + 2*(iplane-1)* 0.5 * detector_thickness
+            istrip = 0
+            do istrip=1,nstrip           
+                   stripID = nstrip*(iplane-1.0) + istrip
+  	   	   pars(1) = 0.0
+                   pars(2) = -0.5*detector_height 
+     >                + (istrip-0.5) * detector_stripwidth * 96/nstrip
+     >                + (istrip-1.0) * detector_stripspace * 96/nstrip
+     >  	      + vshift
+                   pars(3) = -0.5*sensitive_thick+0.5*detector_thickness
+     >                + (iplane-1)*detector_thickness
      >                + (iplane-1)*detector_planespace
-            call gspos ('ELED',iplane,'EBOX',pars(1),pars(2),pars(3),
-     1                  0,'ONLY')
-         enddo
+                   call gspos ('ELED',stripID,'EBOX',pars(1),pars(2),
+     >                pars(3),0,'ONLY')
+            enddo
+	 enddo
+
          call gsatt('ELED', 'COLO', GREEN) ! Change color of the detector
          call gsatt('ELED', 'SEEN', 1)     ! recoil detector is visible
          call gsdet('EDET', 'ELED', 1, 'ELED', 
      1                 32, 1, 10, 10, iset, idet)
          call gsdeth('EDET', 'ELED', 1, names, nbits, orig, fact)
+
+c make gaps filled with diamond but insensitive
+
+         pars(1) = 0.5 * detector_width
+         pars(2) = 0.5 * detector_stripspace * 96/nstrip
+         pars(3) = 0.5 * detector_thickness 
+         call ugsvolu('ELES','BOX ',recoil_mate, pars, 3,volume_num)
+         
+         do iplane=1,nplane
+            if (iplane .eq. 2 .or. iplane .eq. 4) then
+               vshift = detector_planeoffset
+            else
+               vshift = 0.0
+            endif
+            istrip = 0
+            ngap = nstrip-1
+            do istrip=1,nstrip           
+                   stripID = nstrip*(iplane-1.0) + istrip
+  	   	   pars(1) = 0.0
+                   pars(2) = -0.5*detector_height 
+     >                + (istrip-0.5) * detector_stripspace * 96/nstrip
+     >                + (istrip-1.0) * detector_stripwidth * 96/nstrip
+     >  	      + vshift
+                   pars(3) = -0.5*sensitive_thick+0.5*detector_thickness
+     >                + (iplane-1)*detector_thickness
+     >                + (iplane-1)*detector_planespace
+                   call gspos ('ELES',stripID,'EBOX',pars(1),pars(2),
+     >                pars(3),0,'ONLY')
+            enddo
+	 enddo
+
+         call gsatt('ELES', 'COLO', GREEN) ! Change color of the detector
+         call gsatt('ELES', 'SEEN', 1)     ! recoil detector is visible
+         call gsdet('EDET', 'ELES', 1, 'ELES', 
+     1                 32, 1, 10, 10, iset, idet)
+         call gsdeth('EDET', 'ELES', 1, names, nbits, orig, fact)
+        
+
+
+c xxxxxxxxxxxxxxxxxxxxxx         
+
 
       else   ! original code
          call ugstmed (recoil_mate, 'recoil detector$', SILICON_MATE,
