@@ -73,13 +73,22 @@ C DJG Define rotation matrices
 	phz = laser_phi*180/Pi
 	call gsrotm(7,thx,phx,thy,phy,thz,phz)	! laser beam
 
+	thx = 90. !+ detector_yroll
+	phx = 0. !- detector_zroll
+	thy = 90. + detector_rotation
+	phy = 90. !- detector_zroll
+	thz = detector_rotation
+	phz = 90. !+ detector_yroll
+        write(6,*) 'cheesy poofs', thx, phx, thy, phy, thz, phz
+	call gsrotm(8,thx,phx,thy,phy,thz,phz)  ! Electron detector alignment with scattered electron
+
 	thx = 90.
 	phx = 0.
-	thy = 90.+dipole_bend
+	thy = 0.
 	phy = 90.
-	thz = dipole_bend
-	phz = 90.0
-	call gsrotm(8,thx,phx,thy,phy,thz,phz)  ! Electron detector alignment with scattered electron
+	thz = 0.
+	phz = 0.
+	call gsrotm(9,thx,phx,thy,phy,thz,phz)	! Electron Detector Encasement
 
 	call define_CAVE('CAVE')		! define mother volume
 	call define_vacuum('CAVE')		! def vacuum can
