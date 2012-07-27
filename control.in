@@ -14,8 +14,7 @@ c	debug flag (=0 to disable debug)
 c	debug deactivated after # events
 c	debug only every #'th event
 c
-DEBUG 1
- 1000 1
+DEBUG 1 1000 1000
 c
 c define standard histogramc
 c HSTA 'TIME' 'SIZE' 'MULT' 'NTRA' 'STAK'
@@ -65,7 +64,7 @@ c	beta y of beam at exit to straight section in m
 c	emittance of beam in m-radians
 c	electron beam polarization
 c
-BEAM 1.158 10.0e-6 180.  8. 8.  8. 8.  8. 8.  4.4e-10 1.0
+BEAM 1.159 10.0e-6 180. 8. 8. 8. 8. 8. 8. 4.4e-10 0.8500
 c
 c
 c HALO:
@@ -85,7 +84,8 @@ c
 C
 c DIPOLE 125. 10.4775 6.93932413
 c DIPOLE 125. 10.625
-DIPOLE 125. 20.955 103.5
+c DIPOLE 125. 20.955 103.047
+DIPOLE 125. 20.955 104.697
 c
 c CHICANE:
 c	length of chicane (m) 
@@ -122,15 +122,18 @@ c	height of active area (cm)	                       1.92
 c	thickness of detector (um)	                     500.
 c	strip pitch (um)		                     180.
 c       strip space (um)                                      20.
-c       number of strips per plane                            96
+c       number of strips per plane                            96.
 c       plane space (cm)                                       1.
 c       number of planes                                       4
 c       plane offset (um)                                     100.
 c	offset from beam center (mm)	                       5.0
 c       position offset from the entrance of 4th dipole (cm)  10.16   (4 inches)
 c       material number (PbW04 -> 32, Silicon -> 33, Diamond -> 34)
+c	detector rotation angle about the x axis(degrees)     10.137686
+c       detector roll angle about the y axis (degrees)		0.0  Not yet active
+c       detector roll angle about the z axis (degrees)          0.0  Not yet active
 c
-DETECTOR 2.1 1.92 500. 180. 20. 96 1.0 4 100 5. 26.5 34
+DETECTOR 2.1 1.92 500. 180. 20. 96. 1.0 4 0. 5.063 24.5 34 10.3 0. 0.
 c
 c HPGERMANIUM:
 c	distance from crossing point (m)
@@ -171,6 +174,14 @@ c	# of radioactive sources
 c	source energies in MeV (up to 20)
 c
 SOURCES 1 2.2  
+c
+c SEEDS:
+c       Seed1                                            2465761579
+c       Seed2                                            564186545
+c       Iseq (1-215)                                     42
+c       
+SEEDS 115406843 2895674585 198
+c
 c
 c Physics flags
 c
