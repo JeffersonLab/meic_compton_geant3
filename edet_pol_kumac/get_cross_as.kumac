@@ -1,0 +1,33 @@
+beam_energy=[1]
+mass_elec=[2]
+pi_number=[3]
+hbarc=[4]
+lambda=[5]
+
+ve/cr e(1) r [beam_energy]
+ve/cr me(1) r [mass_elec]
+ve/cr pi(1) r [pi_number]
+ve/cr hbarc(1) r [hbarc]
+ve/cr lambda(1) r [lambda]
+
+sigma alpha=1.0/137.0
+sigma ro=alpha*hbarc/me   
+
+sigma k=2*pi*hbarc/(lambda*1e6)
+sigma gamma=e/me
+sigma a=1.0/(1.0+4*k*gamma/me)
+   
+sigma cr1=(rho*rho*(1.0-a)*(1.0-a))/(1.0-rho*(1.0-a))
+sigma cr2=((1.0-rho*(1.0+a))/(1.0-rho*(1.0-a)))**2
+sigma cr3=2.0*pi*ro*ro*a
+sigma cr=cr3*(cr1+1.0+cr2)
+
+sigma a1=2.0*pi*ro*ro*a/cr
+sigma a2=(1.0-rho*(1.0+a))
+sigma a3=1.0/(1-rho*(1-a))**2
+sigma as=a1*a2*(1-a3)
+
+ve/del e; ve/del me; ve/del pi; ve/del hbarc; ve/del lambda
+ve/del alpha; ve/del ro; ve/del k; ve/del gamma; ve/del a
+ve/del cr1; ve/del cr2; ve/del cr3; ve/del cr
+ve/del a1; ve/del a2; ve/del a3

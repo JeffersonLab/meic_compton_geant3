@@ -1,0 +1,1188 @@
+ve/del *
+
+mess 
+
+set ygti
+set gsiz
+set pass 3
+set bwid 5
+igset chhe .4
+set asiz 0.55
+set yval 0.4 
+set xval
+set xlab 1.3
+set ylab 0.5
+
+set ywin  
+set xwin  
+
+
+set xmgl +4
+set xmgr +4
+set ymgl +4
+set ymgu +4
+opt ngrid
+opt nbox
+opt nsta
+ 
+
+
+****************
+**** INPUTS ****
+****************
+
+
+*-> What Plane Number to Analyze
+plane=1
+
+*-> Cuts
+cut_on_error=0.05
+cutontime=120
+cutonbadstrips=0
+whatsigma=5
+cutonbeamoff=20
+noise_correction=1
+
+*-> Charge
+b3_gain=0.0009556118
+b3_offset=0.249741
+errorincharge=0.01
+calccharheasym=0
+
+*-> Theory
+beam_energy=1.159
+mass_elec=0.000511
+pi_number=3.141592
+hbarc=0.197
+lambda=532.0
+thetabend = 10.131
+zdrift = 2.275 
+mfield = 0.544
+lmag = 1.25
+ldet=1.95-30.5/100
+
+*-> Rho
+rho_exctraction=1
+method_rho=2
+rho_parametrization=0
+if ([rho_exctraction] = 0) then
+ dtor1=0
+ dtor2=0
+ dtor3=0
+ dtor4=0
+endif
+*1 extraction
+*2 fit from table
+* syst. due to the size of the strip
+* will be based on the correct mfield
+* which I got from parametrization !!!
+
+*-> Syst
+systshift=0.095
+
+*-> eps file
+epsforeachrun=0
+totalpsfile=0
+
+*-> # of Fit Parameters
+
+fitparam=2
+ 
+
+if ([fitparam] = 1) then 
+  if ([plane] = 1) then
+     param2=
+  endif  
+  if ([plane] = 2) then
+     param2=
+  endif  
+  if ([plane] = 3) then
+    param2=
+  endif  
+  if ([plane] = 4) then
+    param2=
+  endif
+endif
+if ([fitparam] = 2) then
+ param2=0
+endif
+
+
+********************************* 
+**** GET MAX COMPTON DISTANE ****
+*********************************
+ 
+exe compton_theory_maxdistance.kumac _
+[beam_energy] _
+[mass_elec] _
+[pi_number] _
+[hbarc] _
+[lambda] _
+[thetabend] _
+[zdrift] _
+[mfield] _
+[lmag] _
+[ldet]
+
+sigma maxdist=maxdist*1000
+maxd=maxdist(1)
+comp_edge=maxdist(1)
+*comp_edge=[comp_edge]-0.09
+ve/del maxdist
+
+mess
+mess For THOSE SETTNGS MAX. DEVIATION (COMPTON EDGE) 
+mess A) THEORY = 	[maxd]
+mess B) EXPERIMENT =	[comp_edge]
+mess
+
+wait
+ 
+********************************* 
+**** CREATE/DELETE OLD FILES ****
+*********************************
+
+
+sh rm res-[plane].ps
+sh rm pol-plane-[plane].output
+
+FORTRAN/FILE 1 pol-plane-[plane].output
+
+if ([calccharheasym] = 1) then
+ sh rm charge-asymmetry.results
+ FORTRAN/FILE 4 charge-asymmetry.results
+endif
+  
+if ([totalpsfile] = 1) then
+ for/file 44 res-[plane].ps
+ meta 44 -111
+endif
+
+
+***************************************************
+*** RUNS INFO ****** RUNS INFO ****** RUNS INFO ***
+***************************************************
+
+
+
+ve/read runnum,indexnum,v1,v2,v3,v4,trac,trev,pwtl,pwdl,pdel,mw,y,moved,dbeam,gb database.txt
+npts=$vdim(runnum, 1)
+
+mess
+mess
+mess
+
+mess Check your INPUT Parameters .....
+
+mess Plane to Analyze = [plane]
+mess Compton Edge (Distance) = [comp_edge]
+mess Syst. Shift of the Edge = [systshift]
+mess Cut on Errors = [cut_on_error]
+mess Cut on Time = [cutontime]
+mess Cut on Bad Strips = [cutonbadstrips] with Sigma = [whatsigma]
+mess Cut of BEAM OFF Time = [cutonbeamoff]
+mess Noise Correction = [noise_correction]
+if ([fitparam] = 1) then
+ mess You are using FIXED 2nd parameter = [param2]
+endif
+if ([fitparam] = 2) then
+ mess You are using 2(two) FREE parameters
+endif
+
+mess
+
+ 
+***************************
+*** MAIN LOOP OVER RUNS ***
+***************************
+
+opt nsta
+opt nfit
+
+
+do s=1,1
+*do s=1,[npts]
+
+zone
+set xmgl +4
+set xmgr +4
+set ymgl +4
+set ymgu +4
+opt ngrid
+opt nbox
+opt nsta
+ 
+ run=runnum([s])
+ index=indexnum([s])
+ trig=trac([s])
+ goodbad=gb([s])
+
+ 
+*READ COMPTON EDGE DATABASE*
+*AND GET COMPTON EDGE STRIP*
+
+   ve/read runc,cedge database-ce.txt 
+    
+   edge_strip=0
+   plane_used_for_ce=0
+   dots=$vdim(runc, 1)
+    do e=1,[dots]
+    rt=runc([e])
+    rx=cedge([e])
+     if ([run] = [rt]) then
+      edge_strip=[rx]
+     endif
+    enddo
+    ve/del runc; ve/del cedge
+
+
+save_edge_strip=[edge_strip]
+
+if ([plane] = 4) then
+ edge_strip=[edge_strip]-2
+endif
+ 
+mess FOR THE RUN [run], Compton EDGE = [edge_strip]    
+*mess Plane Used for Der. CE = [plane_used_for_ce]  
+
+if ([goodbad] = 0) then
+ mess Junk File = [run]
+endif
+
+if ([save_edge_strip] < 1) goto bad
+if ([goodbad] = 0) goto bad
+*if ([plane_used_for_ce] <> 2) goto bad
+
+    if ([index] < 2) then
+     mess Mistake in Database INDEX = [index] RUN = [run]
+     wait
+    endif
+
+ 
+
+*LIST OF RUNS WHERE THERE ARE ONLY 2 SUBRUNS BUT, the 2nd ONE IS BAD*
+
+startindex=1
+
+if ([run] = 22768) then
+ index=1
+endif
+
+if ([run] = 22826) then
+ startindex=5
+endif
+ 
+ 
+***************************************************
+*** READ BEAM OFF SCALLERS FOR NOISE CORRECTION ***
+***************************************************
+
+vec/cre bn1(96) r 96*0.
+vec/cre bn2(96) r 96*0.
+vec/cre bn3(96) r 96*0.
+vec/cre bn4(96) r 96*0.
+vec/cre bntim(1) r 0.
+
+do i=[startindex],[index] 
+ j=[i]-1 
+ mess [j] 
+ mess BEAM OFF RUN NUMBER = [run]  INDEX = [j]
+
+  ve/cr y1[j](386)
+  ve/cr y2[j](386)
+  ve/cr y3[j](386)
+  ve/cr y4[j](386)
+  ve/cr y5[j](386)
+  ve/cr y6[j](386)
+
+  ve/read y1[j],y2[j],y3[j],y4[j],y5[j] /net/cdaq/cdaql3data/cdaq/compton/DAT/beamoff_[run].[j].dat 
+
+  sigma y6[j]=y1[j]+y2[j]+y3[j]+y4[j]
+
+  ve/copy y6[j](1) bntim[j]
+  ve/copy y6[j](3:98) bn1[j]
+  ve/copy y6[j](99:194) bn2[j]
+  ve/copy y6[j](195:290) bn3[j]
+  ve/copy y6[j](291:386) bn4[j]
+
+  sigma bn1[j] = bn1[j]*4
+  sigma bn2[j] = bn2[j]*4
+  sigma bn3[j] = bn3[j]*4
+  sigma bn4[j] = bn4[j]*4
+
+*-> add beam off numbers for all indexes (for statistics)
+  sigma bn1 = bn1[j] + bn1
+  sigma bn2 = bn2[j] + bn2
+  sigma bn3 = bn3[j] + bn3
+  sigma bn4 = bn4[j] + bn4
+  
+*-> add all beam time together for all indexes  
+  sigma bntim = bntim[j] + bntim
+
+  if ([plane] = 1) then
+   ve/copy bn1 bn
+  endif 
+  if ([plane] = 2) then
+   ve/copy bn2 bn
+  endif 
+  if ([plane] = 3) then
+   ve/copy bn3 bn
+  endif 
+  if ([plane] = 4) then
+   ve/copy bn4 bn
+  endif 
+
+enddo
+ 
+tbeamoff=bntim(1) 
+mess TOTAL BEAM OF TIME  = [tbeamoff]
+ 
+if ([trig] = 24) then 
+ if ([tbeamoff] > [cutonbeamoff]) then 
+  ve/del obn
+  ve/del obntim
+  ve/copy bn obn
+  ve/copy bntim obntim
+ endif
+ 
+ if ([tbeamoff] < [cutonbeamoff]) then
+  mess Current Run = [run]
+  mess Total BEAM OFF Time is to SMALL, lets use previouse RUN
+  ve/copy obn bn
+  ve/copy obntim bntim
+  tbeamoff=bntim(1)
+ endif 
+endif
+
+mess TRIG = [trig]
+   
+*****************
+*** READ DATA ***
+*****************
+ 
+do i=[startindex],[index] 
+ j=[i]-1 
+ mess [j] 
+ mess REAL DATA RUN NUMBER = [run]  INDEX = [j]
+  ve/cr x1[j](387)
+  ve/cr x2[j](387)
+  ve/cr x3[j](387)
+  ve/cr x4[j](387)
+  ve/cr x5[j](387)
+ 
+   ve/read x1[j],x2[j],x3[j],x4[j],x5[j] /net/cdaq/cdaql3data/cdaq/compton/DAT/run_[run].[j].dat 
+
+*** READING FORMATS *** START *** 
+
+*onplus -> Charge Laser ON+ 
+*ofplus -> Charge Laser OFF+
+*onmin  -> Charge Laser ON-
+*ofmin  -> Charge Laser OFF-
+*time1  -> Total time of beam ON (ie > 20 uA)
+
+*lponp  -> Laser Power ON+
+*lpofp  -> Laser Power OFF+
+*lponm  -> Laser Power ON-
+*lpofm  -> Laser Power OFF-  
+*time2  -> Total time of run
+
+*lonpt  -> Time of beam on laser_on+ 
+*lofpt  -> Time of beam on laser_off+
+*lonmt  -> Time of beam on laser_on-
+*lofmt  -> time of beam on laser_off-
+*time      -> Total time of beam on + laser on+laser_off
+
+  ve/copy x1[j](1) onplu[j] 
+  ve/copy x2[j](1) ofplu[j]
+  ve/copy x3[j](1) onmin[j] 
+  ve/copy x4[j](1) ofmin[j] 
+  ve/copy x5[j](1) time1[j]
+
+  ve/copy x1[j](2) lponp[j] 
+  ve/copy x2[j](2) lpofp[j]
+  ve/copy x3[j](2) lponm[j] 
+  ve/copy x4[j](2) lpofm[j] 
+  ve/copy x5[j](2) time2[j]
+
+  ve/copy x1[j](3) lonpt[j] 
+  ve/copy x2[j](3) lofpt[j]
+  ve/copy x3[j](3) lonmt[j] 
+  ve/copy x4[j](3) lofmt[j] 
+  ve/copy x5[j](3) time[j]
+ 
+if ([plane] = 1) then
+  ve/copy x1[j](4:99) nplus[j] 
+  ve/copy x2[j](4:99) nplub[j]
+  ve/copy x3[j](4:99) nmin[j]
+  ve/copy x4[j](4:99) nminb[j]
+  ve/copy x5[j](4:99) nn[j]
+endif
+ if ([plane] = 2) then
+   ve/copy x1[j](100:195) nplus[j] 
+   ve/copy x2[j](100:195) nplub[j]
+   ve/copy x3[j](100:195) nmin[j]
+   ve/copy x4[j](100:195) nminb[j]
+   ve/copy x5[j](100:195) nn[j]
+ endif
+  if ([plane] = 3) then
+    ve/copy x1[j](196:291) nplus[j] 
+    ve/copy x2[j](196:291) nplub[j]
+    ve/copy x3[j](196:291) nmin[j]
+    ve/copy x4[j](196:291) nminb[j]
+    ve/copy x5[j](196:291) nn[j]
+  endif
+   if ([plane] = 4) then
+     ve/copy x1[j](292:387) nplus[j]
+     ve/copy x2[j](292:387) nplub[j]
+     ve/copy x3[j](292:387) nmin[j]
+     ve/copy x4[j](292:387) nminb[j]
+     ve/copy x5[j](292:387) nn[j]
+   endif
+
+  sigma nplus[j]=nplus[j]*4
+  sigma nplub[j]=nplub[j]*4
+  sigma nmin[j]=nmin[j]*4
+  sigma nminb[j]=nminb[j]*4
+
+*-> Get Ratio of Times (BEAM ON, LASER ON/OFF +/- vs BEAM OFF Time)
+  sigma tonp[j]=lonpt[j]/bntim
+  sigma tofp[j]=lofpt[j]/bntim
+  sigma tonm[j]=lonmt[j]/bntim
+  sigma tofm[j]=lofmt[j]/bntim
+ 
+************************
+*** NOISE CORRECTION ***
+************************
+
+ if ([noise_correction] = 1) then
+   
+  if ([trig] = 24) then
+   sigma p[j]=nplus[j]-tonp[j]*bn
+   sigma pb[j]=nplub[j]-tofp[j]*bn
+   sigma m[j]=nmin[j]-tonm[j]*bn
+   sigma mb[j]=nminb[j]-tofm[j]*bn
+
+*-> in case if BEAM ON Laser OFF data is NEGATIVE 
+    do jk=1,96
+     zer=0.0  
+     tmp=pb[j]([jk])
+     tmpx=p[j]([jk])
+      if ([tmp] < 0) then
+       vec/inp pb[j]([jk]) [zer] 
+*       vec/inp p[j]([jk]) [zer] 
+      endif
+      tmp=mb[j]([jk])
+      tmpx=m[j]([jk])
+      if ([tmp] < 0) then
+       vec/inp mb[j]([jk]) [zer] 
+*       vec/inp m[j]([jk]) [zer] 
+      endif
+     enddo
+
+    do jk=1,96
+     zer=0.0  
+     tmpx=p[j]([jk])
+      if ([tmpx] <= 0) then
+       vec/inp p[j]([jk]) [zer] 
+       vec/inp m[j]([jk]) [zer] 
+      endif
+      tmpx=m[j]([jk])
+      if ([tmpx] <= 0) then
+       vec/inp m[j]([jk]) [zer] 
+       vec/inp p[j]([jk]) [zer] 
+      endif
+     enddo
+
+   endif
+
+     if ([trig] = 24) then
+      if ([tbeamoff] < [cutonbeamoff]) then
+       mess Something wrong
+       wait
+      endif 
+     endif  
+
+     if ([trig] = 34) then
+      sigma p[j]=nplus[j]*1
+      sigma pb[j]=nplub[j]*1
+      sigma m[j]=nmin[j]*1
+      sigma mb[j]=nminb[j]*1     
+     endif 
+   
+ endif
+ 
+***************************
+*** NO NOISE CORRECTION ***
+***************************
+
+  if ([noise_correction] = 0) then
+   sigma p[j]=nplus[j]*1
+   sigma pb[j]=nplub[j]*1
+   sigma m[j]=nmin[j]*1
+   sigma mb[j]=nminb[j]*1  
+   
+    do jk=1,96
+     zer=0.0  
+     tmpx=p[j]([jk])
+      if ([tmpx] <= 0) then
+       vec/inp p[j]([jk]) [zer] 
+       vec/inp m[j]([jk]) [zer] 
+      endif
+      tmpx=m[j]([jk])
+      if ([tmpx] <= 0) then
+       vec/inp m[j]([jk]) [zer] 
+       vec/inp p[j]([jk]) [zer] 
+      endif
+     enddo
+   
+  endif
+
+************************ 
+*** CHARGE AND RATIO ***
+************************
+   
+  sigma onplu[j] = [b3_gain]*(onplu[j] - lonpt[j]*[b3_offset])
+  sigma onmin[j] = [b3_gain]*(onmin[j] - lonmt[j]*[b3_offset])
+  sigma ofplu[j] = [b3_gain]*(ofplu[j] - lofpt[j]*[b3_offset])
+  sigma ofmin[j] = [b3_gain]*(ofmin[j] - lofmt[j]*[b3_offset])
+ 
+  sigma norm[j]=onmin[j]/ofmin[j]
+  sigma norp[j]=onplu[j]/ofplu[j]
+  sigma norpm[j]=onplu[j]/onmin[j]
+  
+  if ([calccharheasym] = 1) then
+* -> for Charge Asymmetry Start *
+   sigma ca_p[j]=onplu[j]+ofplu[j]
+   sigma ca_m[j]=onmin[j]+ofmin[j]     
+   sigma oshib=sqrt(ca_p[j]+ca_m[j])     
+   sigma ca[j]=(ca_p[j]-ca_m[j])/(ca_p[j]+ca_m[j])
+   sigma eca[j]=ca[j]*sqrt((oshib/(ca_p[j]-ca_m[j]))**2+(oshib/(ca_p[j]+ca_m[j]))**2)
+   ve/del oshib
+*  sigma eca[j]=2.0*[errorincharge]*ca[j]
+* -> for Charge Asymmetry Stop  
+  endif
+
+* for charge asymetry study START
+*    ve/copy norp[j] norm[j]
+*    ve/del normp[j]
+*    ve/cr normp[j](1) r 1 
+* for charge asymetry study STOP
+ 
+  sigma diff[j]=(p[j]-norp[j]*pb[j])-norpm[j]*(m[j]-norm[j]*mb[j]) 
+  sigma summ[j]=(p[j]-norp[j]*pb[j])+norpm[j]*(m[j]-norm[j]*mb[j])   
+  sigma rat[j]=diff[j]/summ[j]
+    
+************** 
+*** ERRORS ***
+**************
+  
+  if ([trig] = 34) then
+   ve/del bn
+   ve/cr bn(96) r 96*0
+  endif
+  if ([noise_correction] = 0) then
+   ve/del bn
+   ve/cr bn(96) r 96*0
+  endif
+  
+  sigma er1[j]=(1.0-rat[j])*(1.0-rat[j])/(summ[j]*summ[j])
+  sigma er2[j]=nplus[j]+(tonp[j]*tonp[j]-2.0*norp[j]*tonp[j]*tofp[j]+norp[j]*norp[j]*tofp[j]*tofp[j])*bn+norp[j]*norp[j]*nplub[j]
+  sigma er12[j]=er1[j]*er2[j]
+  sigma er3[j]=(1.0+rat[j])*(1.0+rat[j])*norpm[j]*norpm[j]/(summ[j]*summ[j])
+  sigma er4[j]=nmin[j]+(tonm[j]*tonm[j]-2.0*norm[j]*tonm[j]*tofm[j]+norm[j]*norm[j]*tofm[j]*tofm[j])*bn+norm[j]*norm[j]*nminb[j]
+  sigma er34[j]=er3[j]*er4[j]
+
+  sigma er5[j]=2.0*(1.0-rat[j]*rat[j])*norpm[j]/(summ[j]*summ[j])
+  sigma er6[j]=(tonp[j]-norp[j]*tofp[j])*(tonm[j]-norm[j]*tofm[j])*bn
+  sigma er56[j]=er5[j]*er6[j]
+  
+  sigma er[j]=sqrt(er12[j]+er34[j]-er56[j])
+ 
+ 
+enddo
+ 
+ve/copy x5[startindex](292:387) nn 
+
+***************
+*** AVERAGE ***
+***************
+
+
+ve/cr sred1(1) r 
+ve/cr sred2(1) r
+
+if ([calccharheasym] = 1) then
+ ve/cr abs1(1) r 
+ ve/cr abs2(1) r
+endif 
+
+ve/cr time(1) r
+ve/cr sm(1) r 
+do i=[startindex],[index] 
+ j=[i]-1 
+ ve/copy time[j] temp
+ ttt=temp(1)
+ ve/del temp
+ if ([ttt] > [cutontime]) then
+  sigma sred1=(rat[j]/er[j]**2) + sred1
+  sigma sred2=(1/er[j]**2)+sred2
+  sigma time=time[j]+time
+  sigma sm=summ[j]+sm
+
+ if ([calccharheasym] = 1) then
+  sigma abs1=(ca[j]/eca[j]**2) + abs1
+  sigma abs2=(1/eca[j]**2)+abs2
+ endif  
+  
+ endif
+enddo
+ 
+sigma rat=sred1/sred2 
+sigma er=sqrt(1/sred2)
+ 
+if ([calccharheasym] = 1) then
+ sigma charas=abs1/abs2
+ sigma echaras=sqrt(1/abs2)
+ ve/del abs1; ve/del abs2  
+endif 
+ 
+ve/del sred1; ve/del sred2
+  
+tim=time(1)  
+ve/del time
+* wait
+**************************
+*** CALCULATE DISTANCE ***
+**************************
+ mess
+ mess Calculating Distance for each Strip .... Start
+ 
+ ve/cr dist([edge_strip]) r
+ mess Comton Edge Distance = [comp_edge] 
+ mess Compton Edge Strip = [edge_strip] 
+
+ if ([fitparam] = 1) then
+ mess Second Parameter is = [param2] 
+ endif
+ if ([fitparam] = 2) then
+ mess Two Free Parameters
+ endif
+
+  do b=1,[edge_strip]
+   if ([fitparam] = 1) then 
+    distance=[comp_edge]-0.2*([edge_strip]-[b])*[param2]
+   endif 
+   if ([fitparam] = 2) then 
+    distance=[comp_edge]-0.2*([edge_strip]-[b])
+   endif 
+*->   mess [b] [distance]
+   ve/inp dist([b]) [distance]
+  enddo
+  mess Calculating Distance for each Strip .... Done
+ 
+**********************************
+*** CALCULATE DISTANCE ***********
+*** WITH OFFSET FOR SYST STUDY ***
+**********************************
+
+* since the size of the strip is 0.18 mm
+* and the real compton edge could be everywhere
+* between this 0.18 mm, lets shift the distance of the data
+* by the half + and - 
+
+*+syst*
+
+exe compton_syst_study-1.kumac _
+[comp_edge] _
+[edge_strip] _
+[systshift] _
+ 
+*******************************
+*** CONVERT DISTANCE TO RHO ***
+*******************************
+
+mess
+mess Convert Distance to Row .... Start 
+
+if ([rho_exctraction] = 1) then
+mess Rho from Exctraction ...
+
+filexist=$FEXIST(distance_to_rho_mfield-[mfield].table)  
+
+if ([filexist] = 1) then
+ mess
+ mess TABLE=distance_to_rho_mfield-[mfield].table EXISTS
+ mess
+endif
+
+if ([filexist] = 0) then
+ mess
+ mess TABLE=distance_to_rho_mfield-[mfield].table
+ mess Does Not Exists, Creating ...
+ mess
+exe compton_theory_distance_to_rho_table.kumac _
+[beam_energy] _
+[mass_elec] _
+[pi_number] _
+[hbarc] _
+[lambda] _
+[thetabend] _
+[zdrift] _
+[mfield] _
+[lmag] _
+[ldet]
+endif
+  
+* Polychenie Rho iz Tablici (Exctract) *
+if ([method_rho] = 1) then 
+ ve/cr rho([edge_strip])
+ mess Get Rho from Distance ......... Method-1
+  do getrho=1,[edge_strip]
+   select=1
+   exe compton_theory_distance_to_rho_extra.kumac [mfield] [getrho] [select]
+  enddo   
+ ve/del tdist 
+ ve/del trho
+endif
+
+* Polychenie Rho iz Tablici (fit) *
+* eti porametri nezavisimo ot fita I ispolzyt v konecnom
+* fite polarizacii
+ ve/read dt,rt distance_to_rho_mfield-[mfield].table
+ tn=$vdim(dt, 1)
+ sigma dt=dt*1000
+ ve/cr xxx([tn]) r [tn]*0.000001
+ ve/cr par(4) r
+ ve/cr errpar(4) r
+ ve/fit dt rt xxx p3 0 4 par ? ? ? errpar
+ dtor1=par(1)
+ dtor2=par(2)
+ dtor3=par(3)
+ dtor4=par(4)
+ ve/del dt; ve/del rt; ve/del xxx; ve/del par; ve/del errpar
+if ([method_rho] = 2) then
+ mess Get Rho from Distance ......... Method-2
+ mess
+ sigma rho=([dtor1])+([dtor2])*dist+([dtor3])*dist*dist+([dtor4])*dist*dist*dist
+ mess P1 for RHO = [dtor1]
+ mess P2 for RHO = [dtor2]
+ mess P3 for RHO = [dtor3]
+ mess P4 for RHO = [dtor4]
+endif 
+ 
+endif 
+  
+mess Convert Distance to Row .... Done
+ 
+******************************************
+*** CALCULATE THEORY ASYMMETRY ***********
+******************************************
+
+mess
+mess Calculating THEORY ASYMMETRY ...
+
+exe get_cross_as.kumac _
+[beam_energy] _
+[mass_elec] _
+[pi_number] _
+[hbarc] _
+[lambda]
+
+ 
+******************************************
+*** CALCULATE THEORY ASYMMETRY ***********
+*** FOR Syst. SHIFTS *********************
+******************************************
+
+mess
+mess Calculating THEORY ASYMMETRY with SYST. Shifts ...
+
+exe compton_syst_study-2.kumac _
+[beam_energy] _
+[mass_elec] _
+[pi_number] _
+[hbarc] _
+[lambda]
+ 
+ 
+************************************************
+*** GET RID OF THE BAD POINTS and BAD STRIPS ***
+************************************************
+
+mess
+mess Get Rid of the Bad Points and Bad Strips .... Start
+
+do x=1,[edge_strip]
+ noisy[x]=0
+enddo
+
+if ([cutonbadstrips] = 1) then
+    ve/read runstr,badstr bad.strips.plane-[plane]-[whatsigma]s
+    bstr=$vdim(runstr, 1)
+    do x=1,[bstr]
+     noisestrips=badstr([x])
+     runstrx=runstr([x])
+      if ([run] = [runstrx]) then
+       do i=1,[edge_strip] 
+        if ([i] = [noisestrips]) then
+         mess For this Run = [run] there is noisy strip = [noisestrips]
+         noisy[i]=[noisestrips]
+        endif
+       enddo
+      endif
+    enddo
+endif	
+  
+good=0
+do i=1,[edge_strip]
+rr=rat([i])
+ee=er([i])
+badstrips=[noisy[i]]
+ if ([i] <>  [badstrips]) then
+  if ([rr] <> 0) then
+   if ([ee] < [cut_on_error]) then
+    good=[good]+1
+   endif
+  endif 
+ endif
+enddo
+ 
+mess
+mess Number of GOOD POINTS = [good] out of [edge_strip]
+  
+ve/cr ratg([good])
+ve/cr erg([good])
+ve/cr distg([good])
+ve/cr distgsp([good])
+ve/cr distgsm([good])
+ve/cr asym([good])
+ve/cr asymsp([good])
+ve/cr asymsm([good])
+ve/cr smg([good])
+ve/cr rhog([good])
+  
+good=0
+do i=1,[edge_strip]
+rr=rat([i])
+ee=er([i])
+badstrips=[noisy[i]]
+di=dist([i])
+dip=distsp([i])
+dim=distsm([i])
+aa=as([i])
+aasp=as_sp([i])
+aasm=as_sm([i])
+ss=sm([i])
+roro=rho([i])
+ if ([i] <>  [badstrips]) then
+  if ([rr] <> 0) then
+   if ([ee] < [cut_on_error]) then
+     good=[good]+1   
+     ve/inp ratg([good]) [rr]
+     ve/inp erg([good]) [ee]
+     ve/inp distg([good]) [di]
+     ve/inp distgsp([good]) [dip]
+     ve/inp distgsm([good]) [dim]
+     ve/inp asym([good]) [aa]
+     ve/inp asymsp([good]) [aasp]
+     ve/inp asymsm([good]) [aasm]
+     ve/inp smg([good]) [ss]
+     ve/inp rhog([good]) [roro]
+   endif 
+  endif
+ endif
+enddo
+
+mess
+mess Get Rid of the Bad Points and Bad Strips .... Done
+ 
+
+**********************************************
+*** CALCULATE POLARIZATION FROM LINEAR FIT ***
+********************************************** 
+**********************************************
+*** CALCULATE POLARIZATION FROM LINEAR FIT ***
+********************************************** 
+**********************************************
+*** CALCULATE POLARIZATION FROM LINEAR FIT ***
+********************************************** 
+ 
+mess 
+mess Calculate Polarization from Linear Fit .... Start
+ 
+exe exp_polarization_linear.kumac _
+[good] _
+[edge_strip] _
+[run] _
+[tim]
+
+ve/cr rhot(100) r
+ve/cr sigt(100) r
+ve/cr asumt(100) r
+ve/read rhot,sigt,asumt compton.out
+
+GRAPHICS/ATTRIBUTES/COLOR_TABLE 151 0.5 0.5 0.5
+set faci 151
+SET FAIS 1
+set lwid 7
+graph 100 rhot(1:100) asumt(1:100) 'l'
+SET FAIS
+set lwid
+  
+mess
+mess Calculate Polarization from Linear Fit .... Done
+mess
+
+ 
+**************************************************
+*** CALCULATE POLARIZATION FROM TWO PARAMs FIT ***
+************************************************** 
+**************************************************
+*** CALCULATE POLARIZATION FROM TWO PARAMs FIT ***
+************************************************** 
+**************************************************
+*** CALCULATE POLARIZATION FROM TWO PARAMs FIT ***
+************************************************** 
+ 
+mess 
+mess Calculate Polarization from Two Parameters Fit .... Start
+
+
+if ([epsforeachrun] = 1) then  
+ for/file 34 pol-[run]-plane-[plane].eps 
+ meta 34 -113  
+endif
+
+if ([fitparam] = 2) then 
+ sigma ns=comedge-([comp_edge]-distg)/0.2
+endif
+
+if ([fitparam] = 1) then 
+ sigma ns=comedge-([comp_edge]-distg)/(0.2*[param2])
+endif 
+  
+ 
+*2) Plot Asummetry vs Strip Number
+
+null -5 60 -0.07 0.15
+
+set xlab 2.2
+set ylab 1.2
+set asiz 0.7
+atitl ' ' 'Asymmetry'
+atitl 'Strip Number'
+set plci 1
+line -5 0 100 0
+
+ve/cr abcde([good]) r [good]*0.0000001 
+set pmci 2
+graph/hplot/err ns ratg abcde erg 100 20 0.25
+set pmci 1
+graph/hplot/err ns ratg abcde erg 100 24 0.25
+ve/del abcde
+
+*3) FIT
+ve/del par
+ve/del errpar
+
+*mess comp_edge=[comp_edge]
+*mess edge_strip=[edge_strip]
+*mess param2=[param2] 
+*mess fitparam=[fitparam] 
+*mess beam_energy=[beam_energy]
+*mess mass_elec=[mass_elec]
+*mess pi_number=[pi_number]
+*mess hbarc=[hbarc]
+*mess lambda=[lambda] 
+*mess dtor1=[dtor1]
+*mess dtor2=[dtor2]
+*mess dtor3=[dtor3]
+*mess dtor4=[dtor4]
+
+ve/inp ?(1:1) [comp_edge]
+ve/inp ?(2:2) [edge_strip]
+ve/inp ?(3:3) [param2] 
+ve/inp ?(4:4) [fitparam] 
+ve/inp ?(5:5) [beam_energy]
+ve/inp ?(6:6) [mass_elec]
+ve/inp ?(7:7) [pi_number]
+ve/inp ?(8:8) [hbarc]
+ve/inp ?(9:9) [lambda] 
+ve/inp ?(10:10) [dtor1]
+ve/inp ?(11:11) [dtor2]
+ve/inp ?(12:12) [dtor3]
+ve/inp ?(13:13) [dtor4]
+ 
+if ([fitparam] = 2) then
+ ve/cr par(2)
+ ve/cr errpar(2) 
+endif
+if ([fitparam] = 1) then
+ ve/cr par(1)
+ ve/cr errpar(1)
+endif
+
+ve/cr chi2(1) r
+
+ve/fit ns ratg erg asum_fit.f s [fitparam] par ! ! ! errpar 
+ 
+Call chiq.f
+x2=chi2(1)
+   
+*4) Print on the Screen 
+set txci 1
+string1 = Run (Laser ON/OFF) = [run]
+graph/prim/text 0 0.135 [string1] ! ! !
+
+set txci 1
+string3 = Run Duration (Laser ON/OFF) = [tim] Sec.
+graph/prim/text 0 0.120 [string3] ! ! !
+ 
+pol2par=par(1) 
+epol2par=errpar(1) 
+
+pol2par=[pol2par]*100
+epol2par=[epol2par]*100
+
+if ([fitparam] = 2) then 
+ pos=par(2) 
+ epos=errpar(2) 
+endif
+if ([fitparam] = 1) then 
+ pos=[param2]
+ epos=0.000
+endif
+ 
+sss=syst(1)
+sssf=$FORMAT([sss],F6.4)
+
+pol2par=$FORMAT([pol2par],F6.4)
+epol2par=$FORMAT([epol2par],F6.4)
+set txci 2
+string7 = Pol. = [pol2par]"Y# +/- [epol2par]"Y# +/- [sssf]"Y#
+graph/prim/text 0 0.105 [string7] ! ! !
+set txci 1
+
+pol2par=$FORMAT([pol2par],F6.4)
+epol2par=$FORMAT([epol2par],F6.4)
+set txci 2
+string7 = Pol. = [pol2par]"Y# +/- [epol2par]"Y#
+graph/prim/text 0 0.105 [string7] ! ! !
+set txci 1
+
+pos=$FORMAT([pos],F6.4)
+epos=$FORMAT([epos],F6.4)
+set txci 2
+string71 = Pos. = [pos] +/- [epos]
+graph/prim/text 0 0.090 [string71] ! ! !
+set txci 1
+
+set txci 2
+x2f=$FORMAT([x2],F6.4)
+string77 = [v]^2! of the Fit = [x2f]
+graph/prim/text 0 0.075 [string77] ! ! !
+set txci 1
+  
+set txci 4
+string8 = Theory(Fit)
+graph/prim/text 0 0.060 [string8] ! ! !
+set txci 1  
+
+set lwid 5  
+line 15 0.063 22 0.063
+set lwid
+  
+set hwid 7
+set hcol 3
+set ltyp 1
+ fun/plo asum_fit.f -5 60 s,c 
+set hwid  
+set hcol 1 
+  
+if ([fitparam] = 1) then 
+ ve/cr fpar(2) r
+ ve/inp fpar(1:1) [param2] 
+ ve/inp fpar(2:2) 0  
+endif
+ 
+if ([fitparam] = 2) then 
+ ve/cr fpar(2) r
+ ve/inp fpar(1:1) par(2)
+ ve/inp fpar(2:2) errpar(2)
+ param2=par(2)
+endif
+
+      
+     if ([pol2par] > 0) then
+      ve/cr posneg(1) r 1
+     endif 
+     if ([pol2par] < 0) then
+      ve/cr posneg(1) r -1
+     endif 
+
+ve/cr abcde(1) r [good]  
+ve/write runnum([s]),pollin,epollin,chi2lin,_
+comedge,syst,temp,par(1),errpar(1),fpar(1:1),_
+fpar(2:2),chi2,posneg,abcde pol-plane-[plane].output _
+(F6.0,3(1x,F9.5),F5.1,1x,F7.4,1x,F6.0,5(1x,F10.6),2(1x,F3.0)) ' '
+*12.10
+*10.6
+ve/del abcde
+ 
+if ([calccharheasym] = 1) then
+ve/write runnum([s]),charas,echaras charge-asymmetry.results (F6.0,2x,F12.10,2x,F12.10) ' '
+endif
+ 
+if ([epsforeachrun] = 1) then  
+ close 34
+endif 
+
+mess 
+mess Calculate Polarization from Two Parameters Fit .... Done
+mess
+  
+ 
+    
+   
+********************
+** DEL EVERYTHING **
+********************
+
+ve/del x*; ve/del n*
+ve/del d*; ve/del s*; ve/del rat*; ve/del er*;
+ve/del a*; ve/del pol; ve/del pa*;
+ve/del lam*;
+ve/del gam*; ve/del rho;
+ve/del cr*; ve/del ep*; ve/del polsp; ve/del polsm
+ve/del lpon*; ve/del lpof*; ve/del badstr; ve/del runstr
+ve/del lon*; ve/del lof*
+ve/del y*; ve/del bn*; ve/del p*; ve/del m*;
+ve/del on*; ve/del of*; ve/del ti*; ve/del to*
+ve/del comedge; ve/del chi2lin; ve/del temp
+ve/del rhosp; ve/del rhosm; ve/del rhog; ve/del fpar
+ve/del rhot
+ve/del chi2; ve/del charas; ve/del echaras; ve/del ca*; ve/del eca*
+
+ 
+bad:
+ 
+ 
+enddo
+
+FORTRAN/CLOSE 1
+
+
+if ([calccharheasym] = 1) then
+ FORTRAN/CLOSE 4
+endif
+
+if ([totalpsfile] = 1) then
+ close 44
+endif 
+
+mess
+mess
+mess End of the Analysis; Plane = [plane] , Fit is Done only with  = [fitparam] parameter. 
+mess The End ........
+mess
+mess

@@ -1,0 +1,123 @@
+good=[1]
+edge_strip=[2]
+run=[3]
+tim=[4]
+
+**********************************************
+*** CALCULATE POLARIZATION FROM LINEAR FIT ***
+********************************************** 
+ 
+***************************
+*** PLOT PLOT PLOT PLOT ***
+***************************
+  
+null 0.3 1.1 -0.07 0.15
+    
+set xlab 2.2
+set ylab 1.2
+set asiz 0.7
+atitl ' ' 'Asymmetry'
+atitl '[r]'
+
+ve/cr abcde([good]) r [good]*0.0000001 
+set pmci 2
+graph/hplot/err rhog ratg abcde erg 100 20 0.25
+set pmci 1
+graph/hplot/err rhog ratg abcde erg 100 24 0.25
+ve/del abcde
+  
+sigma pol=ratg/asym
+sigma epol=erg/abs(asym)
+ 
+sigma polsp=ratg/asymsp
+sigma epolsp=erg/abs(asymsp)
+
+sigma polsm=ratg/asymsm
+sigma epolsm=erg/abs(asymsm)
+ 
+ve/cr par(1) r
+ve/cr errpar(1) r
+ve/fit rhosp polsp epolsp p0 0 1 par ? ? ? errpar
+ve/copy par(1) splus
+
+ve/del par
+ve/del errpar
+ 
+ve/cr par(1) r   
+ve/cr errpar(1) r
+ve/fit rhosm polsm epolsm p0 0 1 par ? ? ? errpar
+ve/copy par(1) sminus
+
+sigma syst=100*abs(splus-sminus)/2
+
+ve/del par
+ve/del errpar
+ 
+ve/cr par(1) r
+ve/cr errpar(1) r
+ve/cr chi2(1) r
+ve/fit rhog pol epol p0 0 1 par ? ? ? errpar
+   
+set plci 1
+line 0 0 2 0
+
+p=par(1)
+ep=errpar(1)
+ 
+Call chiq.f
+
+polar=[p]*100
+epolar=[ep]*100
+x2=chi2(1)
+ 
+mess
+mess +++++++++++++++++++++++++++++++++++++++++++++
+mess Polarization is Equal to [polar] +/- [epolar]
+mess Chi2 of The FIT = [x2]
+mess Edge Strip is Equal to = [edge_strip]
+mess Run Number = [run]
+mess +++++++++++++++++++++++++++++++++++++++++++++
+mess
+  
+set txci 1
+string1 = Run (Laser ON/OFF) = [run]
+graph/prim/text 0.35 0.135 [string1] ! ! !
+
+set txci 1
+string3 = Run Duration (Laser ON/OFF) = [tim] Sec.
+graph/prim/text 0.35 0.120 [string3] ! ! !
+ 
+sss=syst(1)
+sssf=$FORMAT([sss],F6.4)
+polarf=$FORMAT([polar],F7.4)
+epolarf=$FORMAT([epolar],F6.4)
+set txci 2
+*string7 = Pol. = [polarf]"Y# +/- [epolarf]"Y#
+string7 = Pol. = [polarf]"Y# +/- [epolarf]"Y# +/- [sssf]"Y#
+graph/prim/text 0.35 0.105 [string7] ! ! !
+set txci 1
+
+set txci 2
+x2f=$FORMAT([x2],F6.4)
+string77 = [v]^2! of the Fit = [x2f]
+graph/prim/text 0.35 0.090 [string77] ! ! !
+set txci 1
+  
+set txci 1
+string8 = Theory
+graph/prim/text 0.35 0.075 [string8] ! ! !
+set txci 1  
+
+set lwid 5  
+set plci 1
+line 0.48 0.078 0.58 0.078
+set lwid
+set plci 1 
+ 
+sigma pollin=par*100
+sigma epollin=errpar*100
+ve/cr comedge(1) r [edge_strip]
+
+ 
+ve/copy chi2 chi2lin
+ve/del chi2

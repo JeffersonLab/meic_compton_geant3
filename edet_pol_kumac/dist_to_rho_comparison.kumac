@@ -1,0 +1,27 @@
+filecase keep
+
+zone 1 3 
+ 
+ve/cr dist1(1000)
+ve/cr rho1(1000)
+ve/cr dist2(1000)
+ve/cr rho2(1000)
+ve/cr distdif(1000)
+ve/cr distriv(1000)
+
+ve/read dist1,rho1 EU_dist_to_rho.table
+  ve/plot dist1%rho1 
+  set pmci 2
+
+ve/read dist2,rho2 tilt_dist_to_rho.table
+ ve/plot dist2%rho2 ! s
+
+sigma distdif=dist1-dist2
+
+ve/plot distdif%rho1
+
+sigma distdiv=dist1/dist2
+
+ve/plot distdiv%rho1
+
+ve/del *

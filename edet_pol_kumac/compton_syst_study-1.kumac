@@ -1,0 +1,39 @@
+comp_edge=[1]
+edge_strip=[2]
+systshift=[3]
+
+*mess [comp_edge]
+*mess [edge_strip]
+*mess [systshift]
+ 
+comp_edge_syst_plus=[comp_edge]+[systshift]
+
+ve/cr distsp([edge_strip]) r
+do i=1,[edge_strip]
+j=[edge_strip]+1-[i]
+if ([j] = [edge_strip]) then
+  d=[comp_edge_syst_plus]
+ endif
+  if ([j] < [edge_strip]) then
+   d=[d]-0.2
+  endif
+*-> mess X position = [i] [j] [d]
+ ve/inp distsp([j]) [d]
+enddo
+
+*-syst*
+
+comp_edge_syst_minus=[comp_edge]-[systshift]
+  
+ve/cr distsm([edge_strip]) r
+do i=1,[edge_strip]   
+j=[edge_strip]+1-[i]    
+if ([j] = [edge_strip]) then
+  d=[comp_edge_syst_minus]
+ endif
+  if ([j] < [edge_strip]) then
+   d=[d]-0.2
+  endif
+*-> mess X position = [i] [j] [d]
+ ve/inp distsm([j]) [d]
+enddo

@@ -1,0 +1,153 @@
+
+mfield=[1]
+nrho=[2]
+select=[3]
+
+* select = 1 standard
+* select = 2/3 for syst.
+
+
+if ([nrho] = 1) then
+ ve/read tdist,trho distance_to_rho_mfield-[mfield].table
+ sigma tdist=tdist*1000.
+endif
+tn=$vdim(tdist, 1)
+
+* Algho ... x1,x2,,Find that Position, x3,x4
+* Algho ... y1,y2,,Find that Position, y3,y4
+
+if ([select] = 1) then
+ dreal=dist([nrho])
+endif
+
+*if ([select] = 2) then
+* dreal=distsp([nrho])
+* mess Select = 2
+*endif
+
+*if ([select] = 3) then
+* dreal=distsm([nrho])
+* mess Select = 3
+*endif
+
+dreal_save=0
+
+*->mess Distance=[dreal]
+
+do t=1,[tn]
+dis=tdist([t])
+ if ([dis] < [dreal]) then
+  if ([dis] > [dreal_save]) then
+   dreal_save=[dis] 
+   t_save=[t]
+*->   mess [dreal_save] [t_save] [dreal]
+ endif
+endif
+enddo
+ 
+x1=[t_save]+1 
+x2=[t_save] 
+x3=[t_save]-1
+x4=[t_save]-2
+
+if ([x3] <=0 ) then
+ x1=4
+ x2=3
+ x3=2
+ x4=1
+ mess Out of Range
+ mess Max/Min Rho 
+endif
+
+*->mess [x1] [x2] [x3] [x4]
+*->ve/pri tdist([x1])
+*->ve/pri tdist([x2])
+*->ve/pri tdist([x3])
+*->ve/pri tdist([x4])
+
+*->ve/pri trho([x1])
+*->ve/pri trho([x2])
+*->ve/pri trho([x3])
+*->ve/pri trho([x4])
+
+xa1=tdist([x1])
+xa2=tdist([x2])
+xa3=tdist([x3])
+xa4=tdist([x4])
+
+ya1=trho([x1])
+ya2=trho([x2])
+ya3=trho([x3])
+ya4=trho([x4])
+ 
+*->mess [x1] [x2] [x3] [x4] [dreal]
+ 
+* EXTRA *
+	 
+	ns=1
+	n=4
+	
+	dif=abs([dreal]-[xa1])
+	
+ 	
+	do it=1,[n]
+	   dift=abs([dreal]-[xa[it]])
+*->	   mess [dreal] [xa[it]] [dift]
+	   if ([dift] < [dif]) then
+	   	ns=[it]
+	   	dif=[dift]
+	   endif
+	   c[it]=[ya[it]]
+	   d[it]=[ya[it]]
+	enddo
+	
+	 
+	y=[ya[ns]]
+	ns=[ns]-1
+	
+*->	mess NS=[ns]
+*->	mess Y TEMP = [y]
+	
+	 
+	do m=1,[n]-1
+	   do it=1,[n]-[m]
+	    ho=[xa[it]]-[dreal]
+	    im=[it]+[m]
+	    hp=[xa[im]]-[dreal]
+	    it1=[it]+1
+	    w=[c[it1]]-[d[it]]
+	    den=[ho]-[hp]
+	    if ([den] = 0) then
+	      mess
+	      mess Failure Point
+	      mess
+	      wait
+	    endif  
+	    den=[w]/[den]
+	    d[it]=[hp]*[den]
+	    c[it]=[ho]*[den]
+*->	    mess DEN=[den] [w] [c[it1]] [d[it]]
+	   enddo   
+ 	   
+	   ns2=2.*[ns]
+	   nm=[n]-[m]
+	   
+	   if ([ns2] < [nm]) then
+	      ns1=[ns]+1
+	      dy=[c[ns1]]
+	   endif
+	   if ([ns2] >= [nm]) then   
+	      dy=[d[ns]]
+	      ns=[ns]-1
+	   endif
+	   y=[y]+[dy]
+	enddo
+	
+	if ([y] > 1) then
+	 y=1
+	endif
+	
+*->	mess [nrho] Y=[y]
+	
+	ve/inp rho([nrho]) [y]
+ 
