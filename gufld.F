@@ -89,6 +89,7 @@ c        fieldmap=.true.
                   posdip(3) = location(3) - zdip(k)
                  if (posdip(3).gt.0.0) posdip(3) = -posdip(3)
                  call get_field(posdip,field)
+                 field = (dipole_current/110.0)*field
                  if (k.eq.2.or.k.eq.3) field(1) = -1.0*field(1)
                endif
            else
