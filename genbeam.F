@@ -29,8 +29,9 @@ c
 
 c First define the electron vertex at the beginning of the chicane
 
-	random1 = grnd()
-        random2 = grnd()
+c	random1 = grnd()
+c        random2 = grnd()
+        call granor (random1, random2)
 	vertex(1) = random1 * beam_sigmax
 	vertex(2) = chicane_drop + random2 * beam_sigmay
 	vertex(3) = -chicane_length / 2. + 0.8
