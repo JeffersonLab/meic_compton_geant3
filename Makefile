@@ -1,10 +1,10 @@
-#CERN_ROOT = /usr/local/cern/pro
-#CERN_ROOT = /site/cernlib/i386_redhat72_gcc3/2001
-#CERN_ROOT = /usr/local
-#CERN_ROOT = /site/cernlib/i386_fc8/2005/
+#RHEL5
 CERN_ROOT = /apps/cernlib/i386_rhel5/2005/
 CERN_LEVEL = 2005
-#CERN  = CERN_ROOT = /site/cernlib/i386_fc8/
+#64 bit CentOs
+#CERN_ROOT = /usr/lib64/cernlib/2006
+#CERN_LEVEL = 2006
+
 
 INTER = interactive
 
@@ -21,7 +21,7 @@ OBJ = uglast.o uginit.o ugmate.o ugeom.o ugstmed.o ugsvolu.o ugffgo.o \
 SOURCES = compton.F control.in granor.F define_cave.F define_detector.F \
 	define_lattice.F define_vacuum.F do_compton.F fort.4 \
 	genbeam.F genhalo.F gudigi.F gufld.F gukine.F gustep.F \
-	gxcs.F histo_init.F main.F mt 19937.F\
+	gxcs.F histo_init.F main.F mt19937.F\
 	Makefile materials.database README \
 	params.inc testcompton.f trig.F trig.inc ugeom.F \
 	ugeom.inc ugffgo.F uginit.F uglast.F ugmate.F \
@@ -67,7 +67,6 @@ endif
 
 ifeq ($(MYOS),Linux)
  ifeq ($(COMPILER),Absoft)
-#  FABSFLAGS=-O -V -W -f -s -N1 -B108 -B100 -N90 -N22 -N2 -N113
   FABSFLAGS=-O -V -W -f -s -N1 -B108 -B100 -N90 -N22
   EXTRAFLAGS=-DABSOFTFORTRAN
   FFLAGS= $(INCLUDES) $(FABSFLAGS) $(EXTRAFLAGS)
@@ -76,26 +75,20 @@ ifeq ($(MYOS),Linux)
   F77 =$(ABSOFT)/bin/f77
  else
   FC = gfortran
-#  LIBS    = -L/usr/X11R6/lib -lXpm -lXm -lXt -lSM -lICE -lXext -lX11 -lXp -ldl
   LIBS    = -L/usr/lib -lXpm -lXm -lXt -lSM -lICE -lXext -lX11 -lXp -ldl
-#  FFLAGS = -g -I. -O2 -ftree-vectorize -I$(CERN_ROOT)/include -DCERNLIB_TYPE -DCERNLIB_MOTIF -D_FILE_OFFSET_BITS=64
   FFLAGS = -g -I. -I$(CERN_ROOT)/include -DCERNLIB_TYPE -DCERNLIB_MOTIF -D_FILE_OFFSET_BITS=64
   LDXOPTS = -Wl,-uuginit_,-uuglast_,-ugustep_,-ugukine_,-ugudigi,-ugxcs_,-export-dynamic
  endif
 endif
 
-#compton++: $(OBJINTER) $(OBJ) Makefile
-#	gxint -g 321 -m -d Motif -v $(CERN_LEVEL) -o $@ -L$(CERN_ROOT)/lib \
-#	      $(OBJINTER) gxint321.f $(OBJ) -- $(LDXOPTS) $(FFLAGS)
+all: compton++ compton
+
 compton++: $(OBJINTER) $(OBJ) Makefile
 	$(FC) -o $@ gxint321.f $(OBJINTER) $(OBJ) -L$(CERN_ROOT)/lib `cernlib -v $(CERN_LEVEL) geant321 pawlib graflib/Motif packlib mathlib`
 
 
 compton: main.F $(OBJ) Makefile
 	$(FC) $(FFLAGS) -o $@ main.F $(OBJ) $(CERNLIBS) $(LIBS)
-
-#interactive: $(OBJINTER) $(OBJ) Makefile
-#	$(FC) -o $@ gxint321.f $(OBJINTER) $(OBJ) -L$(CERN_ROOT)/lib `cernlib -v $(CERN_LEVEL) geant321 pawlib graflib/Motif packlib mathlib`
 
 tar: $(SOURCES)
 	tar zcf compton_geant.tgz $(SOURCES)
