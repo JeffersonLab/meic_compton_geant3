@@ -65,7 +65,7 @@ c vacuum pipe in straight section
 
       pars(1) =  0.0
       pars(2) =  3.0
-      pars(3) = (chicane_mid + 1.4)/2. ! small overlap to prevent air leaks
+      pars(3) = (chicane_mid + 0.01)/2. ! small overlap to prevent air leaks
       call ugsvolu ('PIPE', 'TUBE', pipe_mate, pars, 3, volume_a)
 
       pars(1)=0
@@ -76,10 +76,11 @@ c vacuum pipe in straight section
 
       pars(1)=0.0
       pars(2)=2.5
-      pars(3) = (chicane_mid + 1.4)/2.   ! small overlap to prevent air leaks
+      pars(3) = (chicane_mid + 0.01)/2.   ! small overlap to prevent air leaks
       call ugsvolu ('PIVE', 'TUBE', pipe_vac, pars, 3, volume_a)
       call gspos ('PIPE', 1, mother, 0., 0., 0., 0, 'MANY')
       call gspos ('PIVE', 1, 'PIPE', 0., 0., 0., 0, 'ONLY')
+
 
       pars(3) =-62.2
       call gspos ('UPPL', 1, 'PIVE', 0., 0., pars(3), 0, 'ONLY')    ! place aperture in vacuum in pipe
@@ -126,7 +127,9 @@ c vacuum pipe in upstream leg
       call gspos ('PIV2', 1, 'PIP2', 0., 0., 0., 0, 'ONLY')
       pars(2) = chicane_drop/2.
       pars(3) = -chicane_length/2. + chicane_drift/2. + dipole_length
-      call gspos ('PIP2', 1, mother, 0., pars(2), pars(3), 5, 'ONLY')
+c      call gspos ('PIP2', 1, mother, 0., pars(2), pars(3), 5, 'ONLY')
+C 'ONLY' above collides with dipole 'ONLY'
+      call gspos ('PIP2', 1, mother, 0., pars(2), pars(3), 5, 'MANY')
       call gsatt ('PIP2', 'COLO', BLACK) ! Change color of the Pipe
       call gsatt ('PIP2', 'SEEN', 1) ! Pipe is visible
 
@@ -233,7 +236,7 @@ c add exit port for backscatter gammas
       pars(3) = port_length / 2. - pars(3)
       call gspos ('FOIL', 1, 'PORV', 0., 0., pars(3), 0, 'ONLY')
       pars(3) = pars(3) + chicane_mid/2 + dipole_length*0.9
-      call gspos ('PORT', 1, mother, 0., 0., pars(3), 0, 'ONLY')
+      call gspos ('PORT', 1, mother, 0., 0., pars(3), 0, 'MANY')
       call gsatt ('PORT', 'COLO', BLACK) ! Change color of the port
       call gsatt ('PORT', 'SEEN', 1) ! port is visible
       call gsatt ('FOIL', 'COLO', RED) ! Change color of the foil
