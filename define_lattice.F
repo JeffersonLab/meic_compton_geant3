@@ -118,7 +118,7 @@ cpat         pars(3) = -chicane_length/2. + dipole_length/2. +
 cpat     $       chicane_drift + dipole_length + chicane_mid + dipole_length
          pars(3) = chicane_mid/2. + dipole_length/2.
 c         call gspos ('DIPO', 3, mother, 0., pars(2), pars(3), 3, 'MANY')
-         call gspos ('DIPO', 3, mother, 0., pars(2), pars(3), 0, 'MANY')
+         call gspos ('DIPO', 3, mother, 0., pars(2), pars(3), 0, 'ONLY')
 
 
 C DJG: Fourth dipole
