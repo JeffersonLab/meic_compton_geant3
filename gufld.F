@@ -36,13 +36,21 @@ c  - add option to use field map instead of a single value for the dipole field
         real xmap_limit,zmap_limit
         real xphy_limit,yphy_limit
         real xdip(4),ydip(4),zdip(4)
+	real Iscale
         logical fieldmap       ! true  --> use field mad values
                                ! false --> use one value for the field everywhere in the dipole
 c
 c-----------------
 c
-        fieldmap=.false.
-c        fieldmap=.true.
+c
+	if (dipole_map.gt.0.1) then
+	   fieldmap=.true.
+	   Iscale = (dipole_current*52.335+65.660)/
+     >              (110.0*52.335+65.660)
+c	   write(6,*) 'scaling field map by',Iscale
+	else
+	   fieldmap=.false.
+	endif
         
 	field(1) = 0				! initially no field
 	field(2) = 0
@@ -71,7 +79,6 @@ c        fieldmap=.true.
 
 
         if (fieldmap) then
-           open(unit=62,file='dipole_fieldmap.dat',status='old')
            posdip(1) = location(1)
            posdip(2) = location(2)
 
@@ -89,7 +96,7 @@ c        fieldmap=.true.
                   posdip(3) = location(3) - zdip(k)
                  if (posdip(3).gt.0.0) posdip(3) = -posdip(3)
                  call get_field(posdip,field)
-                 field = (dipole_current/110.0)*field
+                 field = Iscale*field
                  if (k.eq.2.or.k.eq.3) field(1) = -1.0*field(1)
                endif
            else
@@ -133,6 +140,7 @@ c----------
         real f(45,157)
         real A,B,C,D
         real field_tmp(157)
+	logical first
         character line*357
         real xdipole(45),zdipole(157)
         data xdipole/-11.0,-10.5,-10.0, -9.5, -9.0, -8.5, -8.0, -7.5,
@@ -162,8 +170,10 @@ c----------
      &                -6.0, -5.5, -5.0, -4.5, -4.0, -3.5, -3.0, -2.5,
      &                -2.0, -1.5, -1.0, -0.5,  0.0/
 
+	data first/.true./
+C No amnesia between calls!!!
 
-        open(unit=62,file='dipole_fieldmap.dat',status='old')
+        save
 
 c       Find corresponding lines in dipole_fieldmap.dat
 
@@ -177,8 +187,11 @@ c       Find corresponding lines in dipole_fieldmap.dat
 
  901	continue
 
-        do j=1,157
-           read(62,*)f(1,j), f(2,j), f(3,j), f(4,j), f(5,j), f(6,j),
+	if (first) then ! read in field map first time through
+	   write(6,*) 'reading in field map'
+	   open(unit=62,file='dipole_fieldmap.dat',status='old')
+	   do j=1,157
+	      read(62,*)f(1,j), f(2,j), f(3,j), f(4,j), f(5,j), f(6,j),
      &               f(7,j), f(8,j), f(9,j),f(10,j),f(11,j),f(12,j),
      &               f(13,j),f(14,j),f(15,j),f(16,j),f(17,j),f(18,j),
      &               f(19,j),f(20,j),f(21,j),f(22,j),f(23,j),f(24,j),
@@ -186,7 +199,14 @@ c       Find corresponding lines in dipole_fieldmap.dat
      &               f(31,j),f(32,j),f(33,j),f(34,j),f(35,j),f(36,j),
      &               f(37,j),f(38,j),f(39,j),f(40,j),f(41,j),f(42,j),
      &               f(43,j),f(44,j),f(45,j)
-           if (posdip(3).le.zdipole(j).and.
+	   enddo
+	   close(62)
+	   first=.false.
+	endif
+
+
+	do j=1,157
+	   if (posdip(3).le.zdipole(j).and.
      &         posdip(3).gt.zdipole(j-1)) then 
               jz = j
               goto 902
@@ -227,6 +247,5 @@ c       Find corresponding lines in dipole_fieldmap.dat
         write(6,*)'interp coeff C & D:',C,D
 
  1000	continue
-        close(62)
         return
         end
