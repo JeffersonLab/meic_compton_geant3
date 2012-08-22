@@ -7,7 +7,7 @@ c gamma detector lead tungstate
 c electron detector diamond
 c
 LIST
-TRIGGER 10
+TRIGGER 20000
 c
 c DEBUG:
 c	debug flag (=0 to disable debug)
@@ -80,12 +80,14 @@ c DIPOLE:
 c	length of the dipole in cm (0 -> no dipole)
 c	height of the dipole in cm  ! was 4.125in before adjusting
 c       current in A
+c       use field map (1=yes, 0=no)
 c
 C
 c DIPOLE 125. 10.4775 6.93932413
 c DIPOLE 125. 10.625
 c DIPOLE 125. 20.955 103.047
-DIPOLE 125. 20.955 104.697
+c DIPOLE 125. 20.955 104.697
+DIPOLE 125. 20.955 103.5 1
 c
 c CHICANE:
 c	length of chicane (m) 
@@ -133,7 +135,7 @@ c	detector rotation angle about the x axis(degrees)     10.137686
 c       detector roll angle about the y axis (degrees)		0.0  Not yet active
 c       detector roll angle about the z axis (degrees)          0.0  Not yet active
 c
-DETECTOR 2.1 1.92 500. 180. 20. 96. 1.0 4 0. 5.063 24.5 34 10.3 0. 0.
+DETECTOR 2.1 1.92 500. 180. 20. 96. 1.0 4 0. 8.0 24.5 34 10.3 0. 0.
 c
 c HPGERMANIUM:
 c	distance from crossing point (m)
