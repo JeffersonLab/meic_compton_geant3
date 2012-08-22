@@ -258,15 +258,16 @@ c -June 7, 2003
 *	structure /dipole/		! dipole information
  	  real dipole_length            ! length of the dipole segment in cm
  	  real dipole_height	        ! height of the dipole segment in cm
-          real dipole_current           !dipole current in A
+          real dipole_current           ! dipole current in A
+          real dipole_map               ! flag for using fieldmap (set >0)
  	  real dipole_rho		! radius of curvature in m
  	  real dipole_field		! strength of the dipole field in kG
  	  real dipole_bend		! dipole bending angle
  	  real dipole_h			! beam height change as travel through dipole
 *	end structure			! dipole
 	common /dipole/
-     1   dipole_length, dipole_height, dipole_current, dipole_rho, 
-     2   dipole_field,  dipole_bend, dipole_h
+     1   dipole_length, dipole_height, dipole_current, dipole_map,
+     2   dipole_rho, dipole_field,  dipole_bend, dipole_h
 	equivalence (dipole,dipole_length)
         real dipole
 

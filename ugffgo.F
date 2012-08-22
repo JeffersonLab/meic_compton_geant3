@@ -105,11 +105,12 @@ c Define backscatter card
 
 c Define the dipole input card
 
-      call ffkey('DIPOLE', dipole, 3, 'REAL') ! define dipole card
+      call ffkey('DIPOLE', dipole, 4, 'REAL') ! define dipole card
 
       dipole_length = 0.     ! cm
       dipole_height = 0.     ! cm
       dipole_current= 100.0  ! A
+      dipole_map=0
 c      dipole_rho    = 1.    ! m
 
 	
@@ -232,8 +233,9 @@ C get field from current (use field map): good to 0.1% from 60 to 110 A
       dipole_field = 52.335*dipole_current + 65.660  !Gauss
 C     Note that this field is extracted from a map that gives
 C     Leff =124.58 cm. We want same Bdl but assuming 125 cm
-C     So B_MC = B_map*Lmap/Lideal = B_map * 124.58/125.0      
-      dipole_field = dipole_field * (124.58/125.0) *1.0E-4
+C     So B_MC = B_map*Lmap/Lideal = B_map * 124.58/125.0
+C     Also, B vs I curve taken not at y=0...need additional factor of 0.9986      
+      dipole_field = dipole_field*0.9986*(124.58/125.0) *1.0E-4
       dipole_rho   = beam_E/0.3/dipole_field          ! in m
       dipole_field = dipole_field * 10.               ! T -> kG
       if(dipole_rho.gt.0.0) then
