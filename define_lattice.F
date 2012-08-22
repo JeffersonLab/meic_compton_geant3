@@ -87,7 +87,11 @@ c         call gsatt ('DIPO', 'SEEN', 1)	! dipole is visible
          ! from drawing file EXP-245-7982-007
          pars(1) = 22.           !  a guess
          pars(2) = dipole_height/2.0
+
          pars(3) = dipole_length / 2.
+         if(dipole_map.gt.0.1) then
+            pars(3) = 156.0/2.0
+         endif
          call ugsvolu('DIPO','BOX  ',magnet_mate,pars,3,volume_num)
          pars(1) = 3./2.      
          call ugsvolu('DIPI','BOX  ',beamline_mate,pars,3,volume_num)
