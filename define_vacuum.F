@@ -37,7 +37,7 @@ c Doug Storey Jan 23 2007
       integer pipe_mate, pipe_vac, volume_a, volume_b
       integer beamline_mate, port_mate, foil_mate
       integer flange_mate
-      real port_length
+      real port_length,ltube3,ecylrad
       parameter (port_length=150.)
       real pars(11)
 
@@ -65,7 +65,11 @@ c vacuum pipe in straight section
 
       pars(1) =  0.0
       pars(2) =  3.0
-      pars(3) = (chicane_mid + 0.01)/2. ! small overlap to prevent air leaks
+      if(dipole_map.gt.0.1) then
+         pars(3) = (chicane_mid - (156.0-dipole_length) + 0.01)/2.0
+      else
+         pars(3) = (chicane_mid + 0.01)/2. ! small overlap to prevent air leaks
+      endif
       call ugsvolu ('PIPE', 'TUBE', pipe_mate, pars, 3, volume_a)
 
       pars(1)=0
@@ -76,10 +80,15 @@ c vacuum pipe in straight section
 
       pars(1)=0.0
       pars(2)=2.5
-      pars(3) = (chicane_mid + 0.01)/2.   ! small overlap to prevent air leaks
+      if(dipole_map.gt.0.1) then
+         pars(3) = (chicane_mid - (156.0-dipole_length) + 0.01)/2.0
+      else
+         pars(3) = (chicane_mid + 0.01)/2. ! small overlap to prevent air leaks
+      endif
       call ugsvolu ('PIVE', 'TUBE', pipe_vac, pars, 3, volume_a)
       call gspos ('PIPE', 1, mother, 0., 0., 0., 0, 'MANY')
-      call gspos ('PIVE', 1, 'PIPE', 0., 0., 0., 0, 'ONLY')
+c      call gspos ('PIVE', 1, 'PIPE', 0., 0., 0., 0, 'ONLY')
+      call gspos ('PIVE', 1, 'PIPE', 0., 0., 0., 0, 'MANY')
 
 
       pars(3) =-62.2
@@ -118,7 +127,11 @@ c vacuum pipe in upstream leg
 
       pars(1) =  0.
       pars(2) =  3. ! 3 inch pipe
-      pars(3) = (chicane_drift + 6.4)/2. !small overlap prevents air leaks
+      if(dipole_map.gt.0.1) then
+         pars(3) = (chicane_drift -(156.0-dipole_length) + 6.4)/2.
+      else
+         pars(3) = (chicane_drift + 6.4)/2. !small overlap prevents air leaks
+      endif
       call ugsvolu ('PIP2', 'TUBE', pipe_mate, pars, 3, volume_b)
       pars(2) =  3.5
       call ugsvolu ('PIV2', 'TUBE', pipe_vac, pars, 3, volume_b)
@@ -133,47 +146,54 @@ C 'ONLY' above collides with dipole 'ONLY'
       call gsatt ('PIP2', 'COLO', BLACK) ! Change color of the Pipe
       call gsatt ('PIP2', 'SEEN', 1) ! Pipe is visible
 
+c detector cylinder
+
+      pars(1) =  0.
+c      pars(2) = (0.096*chicane_drift) ! Radius of detector cylinder
+      if(dipole_map.gt.0.1) then
+         ecylrad =(detector_posoffset-(156.0-dipole_length)/2.0+0.01)        ! Radius of edet can
+      else
+         ecylrad = detector_posoffset+0.01 ! Radius of edet can
+      endif
+      pars(2)=ecylrad
+      pars(3) = 10.0 ! Detector height      
+      call ugsvolu ('DetVac', 'TUBE', pipe_vac, pars, 3, volume_b)
+      pars(2) = 3*chicane_drop/4.-1.5
+      pars(3) = chicane_length/2. - dipole_length - detector_posoffset
+      call gspos ('DetVac', 1, mother, 0., pars(2), pars(3), 9, 'MANY')
+      call gsatt ('DetVac', 'COLO', BLACK) ! Change color of the Pipe
+      call gsatt ('DetVac', 'SEEN', 1) ! Pipe is visible
+
 c vacuum pipe in downstream leg - just make the pipe bigger
 
       pars(1) =  0.
       pars(2) =  3.81 ! 3 inch pipe
-      pars(3) = (0.768*chicane_drift + 6.4)/2. !small overlap prevents air leaks
+      if(dipole_map.gt.0.1) then
+         ltube3=chicane_drift-2.0*ecylrad-(156.0-dipole_length)
+      else
+         ltube3 = chicane_drift-2.0*ecylrad
+      endif
+      pars(3)=(ltube3+6.4)/2.0
       call ugsvolu ('PIP3', 'TUBE', pipe_mate, pars, 3, volume_b)
       pars(2) =  3.5 
       call ugsvolu ('PIV3', 'TUBE', pipe_vac, pars, 3, volume_b)
       call gspos ('PIV3', 1, 'PIP3', 0., 0., 0., 0, 'MANY')
-      pars(2) = 171.*chicane_drop/400.
-      pars(3) = chicane_length/2 - 77*chicane_drift/125 - dipole_length
+      if(dipole_map.gt.0.1) then
+         pars(3) = chicane_mid/2.0+dipole_length+ltube3/2.0 + 
+     >       (156.0-dipole_length)/2.0
+      else
+         pars(3) = chicane_mid/2.0+dipole_length+ltube3/2.0
+      endif
+      if(dipole_map.gt.0.1) then
+         pars(2) = chicane_drop/2.0 * 
+     >        (ltube3/chicane_drift) + 3.5*1.75
+      else
+         pars(2) = chicane_drop/2.0 * 
+     >        (ltube3/chicane_drift) + 3.5
+      endif
       call gspos ('PIP3', 1, mother, 0., pars(2), pars(3), 6, 'MANY')
       call gsatt ('PIP3', 'COLO', BLACK) ! Change color of the Pipe
       call gsatt ('PIP3', 'SEEN', 1) ! Pipe is visible
-
-c short additon to downstreem pipe after electron detector cylinder addition
-
-      pars(1) =  0.
-      pars(2) =  3.81 ! 3 inch pipe
-      pars(3) = (0.04*chicane_drift + 6.4)/2. !small overlap prevents air leaks
-      call ugsvolu ('PIP4', 'TUBE', pipe_mate, pars, 3, volume_b)
-      pars(2) =  3.5 
-      call ugsvolu ('PIV4', 'TUBE', pipe_vac, pars, 3, volume_b)
-      call gspos ('PIV4', 1, 'PIP4', 0., 0., 0., 0, 'MANY')
-      pars(2) = 4.*chicane_drop/5.
-      pars(3) = chicane_length/2. - chicane_drift/50. - dipole_length
-      call gspos ('PIP4', 1, mother, 0., pars(2), pars(3), 6, 'MANY')
-      call gsatt ('PIP4', 'COLO', BLACK) ! Change color of the Pipe
-      call gsatt ('PIP4', 'SEEN', 1) ! Pipe is visible
-
-c detector cylinder
-
-      pars(1) =  0.
-      pars(2) = (0.096*chicane_drift) ! Radius of detector cylinder
-      pars(3) = 9. ! Detector hight      
-      call ugsvolu ('DetVac', 'TUBE', pipe_vac, pars, 3, volume_b)
-      pars(2) = 3*chicane_drop/4.-1.5
-      pars(3) = chicane_length/2. - 17*chicane_drift/125 - dipole_length
-      call gspos ('DetVac', 1, mother, 0., pars(2), pars(3), 9, 'MANY')
-      call gsatt ('DetVac', 'COLO', BLACK) ! Change color of the Pipe
-      call gsatt ('DetVac', 'SEEN', 1) ! Pipe is visible
 
 c block stray photons from photon detector
 
@@ -235,7 +255,11 @@ c add exit port for backscatter gammas
       call ugsvolu ('FOIL', 'TUBE', foil_mate, pars, 3, volume_a)
       pars(3) = port_length / 2. - pars(3)
       call gspos ('FOIL', 1, 'PORV', 0., 0., pars(3), 0, 'ONLY')
-      pars(3) = pars(3) + chicane_mid/2 + dipole_length*0.9
+      if(dipole_map.gt.0.1) then
+         pars(3) = pars(3) + chicane_mid/2 + 156.0*0.9
+      else
+         pars(3) = pars(3) + chicane_mid/2 + dipole_length*0.9
+      endif
       call gspos ('PORT', 1, mother, 0., 0., pars(3), 0, 'MANY')
       call gsatt ('PORT', 'COLO', BLACK) ! Change color of the port
       call gsatt ('PORT', 'SEEN', 1) ! port is visible
