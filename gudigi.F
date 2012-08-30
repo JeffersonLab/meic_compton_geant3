@@ -249,7 +249,8 @@ c      enddo
 c Now get the energy deposited in the energy measuring detectors
       nstrip = int(detector_stripnumber)      
 
-      do id = 1, 5*nstrip/96
+c      do id = 1, 5*nstrip/96
+      do id = 1, 5
          nht          = 0
          nht_pl1      = 0.
          nht_pl2      = 0.
