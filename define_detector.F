@@ -138,16 +138,16 @@ c  detector_offset: position of the lower edge of the detector above the main el
       if (edetpos .eq. 2) detector_position = -1.0*detector_posoffset
 
       if (QWEAK) THEN
-         ! first build a virtual board (vacuum) to contain all the plane
+         ! first build a virtual box (vacuum) to contain all the planes
          sensitive_thick = detector_planenumber*detector_thickness 
      >                   + (detector_planenumber-1)*detector_planespace
          material = 31  ! --> my_vac
          call ugstmed (recoil_vac, 'recoil vac$', material,
-     1                 1, 0, FIELDM, TMAXFD, STEMAX, DEEMAX, EPSIL, 
+     1                 0, 0, FIELDM, TMAXFD, STEMAX, DEEMAX, EPSIL, 
      2                 STMIN, 0, 0)
-         pars(1) = 0.5 * detector_width
-         pars(2) = 0.5 * detector_height
-         pars(3) = 0.5 * sensitive_thick
+         pars(1) = 0.5 * detector_width +0.1
+         pars(2) = 0.5 * detector_height +0.1
+         pars(3) = 0.5 * sensitive_thick +0.1
 
          call ugsvolu('EBOX', 'BOX ', recoil_vac, pars, 3, volume_num)
          le      = chicane_drift + detector_position 
@@ -162,7 +162,7 @@ c  detector_offset: position of the lower edge of the detector above the main el
      >             + 0.5 * sensitive_thick 
 c         write(98,*)'ydet= ',pars(2),' cm'
 c         write(98,*)'zdet= ',pars(3),' cm'
-         call gspos ('EBOX',1,mother,pars(1),pars(2),pars(3),8,'ONLY')
+         call gspos ('EBOX',1,mother,pars(1),pars(2),pars(3),8,'MANY')
          call gsatt ('EBOX', 'COLO', BLUE) ! Change color of the detector
          call gsatt ('EBOX', 'SEEN', 1)     ! recoil detector is visible
 
