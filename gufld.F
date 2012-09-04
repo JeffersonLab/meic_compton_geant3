@@ -24,6 +24,7 @@ c  - add option to use field map instead of a single value for the dipole field
 
 	include 'user.inc'
 
+
 *	structure /point/
 *	real x, y, z
 *	end structure
@@ -33,7 +34,7 @@ c  - add option to use field map instead of a single value for the dipole field
         integer k
 	real location(3),field(3)
         real posdip(3)
-        real xmap_limit,zmap_limit
+        real ymap_limit,zmap_limit
         real xphy_limit,yphy_limit
         real xdip(4),ydip(4),zdip(4)
 	real Iscale
@@ -56,26 +57,37 @@ c	   write(6,*) 'scaling field map by',Iscale
 	field(2) = 0
 	field(3) = 0
 
-        xmap_limit = 11.0
+        ymap_limit = 11.0
         zmap_limit = 78.0 
 
         xphy_limit = 22.0/2.0
-        yphy_limit = dipole_height
+        yphy_limit = dipole_height/2.0
+
+	if(yphy_limit.gt.ymap_limit) then
+	   write(6,*) 'Danger Will Robinson: Y-range for field map'
+	   write(6,*) 'larger than physical dipole size. Field map'
+	   write(6,*) 'routine may not work properly - I am outta here'
+	   stop
+	endif
 
         xdip(1)  = 0.0
         xdip(2)  = 0.0
         xdip(3)  = 0.0
         xdip(4)  = 0.0
 
-        ydip(1)  = chicane_drop
-        ydip(2)  = 0.0
-        ydip(3)  = 0.0
-        ydip(4)  = chicane_drop
+        ydip(1)  = chicane_drop-dipole_h/2.0
+        ydip(2)  = 0.0+dipole_h/2.0
+        ydip(3)  = 0.0+dipole_h/2.0
+        ydip(4)  = chicane_drop-dipole_h/2.0
 
-        zdip(1)  = -chicane_length/2.0 + dipole_length/2.0
+c        zdip(1)  = -chicane_length/2.0 + dipole_length/2.0
+        zdip(1)  = - chicane_mid/2. - dipole_length 
+     &             - chicane_drift - dipole_length/2.
         zdip(2)  = -chicane_mid/2.0 - dipole_length/2.0
         zdip(3)  = chicane_mid/2.0 + dipole_length/2.0
-        zdip(4)  = chicane_length/2.0 - dipole_length/2.0
+c        zdip(4)  = chicane_length/2.0 - dipole_length/2.0
+        zdip(4)  = chicane_mid/2. + dipole_length 
+     &             + chicane_drift + dipole_length/2.
 
 
         if (fieldmap) then
@@ -94,10 +106,15 @@ c	   write(6,*) 'scaling field map by',Iscale
                   field(1) = 0.0
                else      
                   posdip(3) = location(3) - zdip(k)
+		  posdip(2) = location(2) - ydip(k)
                  if (posdip(3).gt.0.0) posdip(3) = -posdip(3)
                  call get_field(posdip,field)
-                 field = Iscale*field
+                 field(1) = Iscale*field(1)
+                 field(2) = Iscale*field(2)
+                 field(3) = Iscale*field(3)
+
                  if (k.eq.2.or.k.eq.3) field(1) = -1.0*field(1)
+
                endif
            else
               if (k.lt.4) then
@@ -134,16 +151,17 @@ c	write(6,*) 'Field:', location(3), field(1)
 
 c----------
         subroutine get_field(posdip,field)
+C Note that "x" in the field map refers to the dispersive direction, i.e., "y" in the lab system.
         implicit none
-        integer i,j,ix,jz,ifound
+        integer i,j,iy,jz,ifound
         real posdip(3),field(3)
         real f(45,157)
         real A,B,C,D
         real field_tmp(157)
 	logical first
         character line*357
-        real xdipole(45),zdipole(157)
-        data xdipole/-11.0,-10.5,-10.0, -9.5, -9.0, -8.5, -8.0, -7.5,
+        real ydipole(45),zdipole(157)
+        data ydipole/-11.0,-10.5,-10.0, -9.5, -9.0, -8.5, -8.0, -7.5,
      &                -7.0, -6.5, -6.0, -5.5, -5.0, -4.5, -4.0, -3.5, 
      &                -3.0, -2.5, -2.0, -1.5, -1.0, -0.5,  0.0,  0.5,  
      &                 1.0,  1.5,  2.0,  2.5,  3.0,  3.5,  4.0,  4.5,  
@@ -178,9 +196,9 @@ C No amnesia between calls!!!
 c       Find corresponding lines in dipole_fieldmap.dat
 
         do i=1,45
-           if (posdip(1).le.xdipole(i).and.
-     &         posdip(1).gt.xdipole(i-1)) then
-              ix = i
+           if (posdip(2).le.ydipole(i).and.
+     &         posdip(2).gt.ydipole(i-1)) then
+              iy = i
               goto 901              
            endif
         enddo
@@ -215,11 +233,11 @@ c       Find corresponding lines in dipole_fieldmap.dat
 
  902	continue
 
-        ! interpolate wrt x  (simple linear interpolation)
-        A = (xdipole(ix) - posdip(1))  / (xdipole(ix)-xdipole(ix-1))
-        B = (posdip(1) - xdipole(ix-1))/ (xdipole(ix)-xdipole(ix-1))
-        field_tmp(jz-1) = A*f(ix-1,jz-1) + B*f(ix,jz-1)
-        field_tmp(jz)   = A*f(ix-1,jz)   + B*f(ix,jz)
+        ! interpolate wrt y  (simple linear interpolation)
+        A = (ydipole(iy) - posdip(2))  / (ydipole(iy)-ydipole(iy-1))
+        B = (posdip(2) - ydipole(iy-1))/ (ydipole(iy)-ydipole(iy-1))
+        field_tmp(jz-1) = A*f(iy-1,jz-1) + B*f(iy,jz-1)
+        field_tmp(jz)   = A*f(iy-1,jz)   + B*f(iy,jz)
 
         ! interpolate wrt z  (simple linear interpolation)
         C = (zdipole(jz) - posdip(3))  / (zdipole(jz)-zdipole(jz-1))
@@ -233,15 +251,15 @@ c       Find corresponding lines in dipole_fieldmap.dat
         goto 1000 ! jump the screen printing of the following control values 
         write(6,*)'************************************************'
         write(6,*)'interp in x:', 
-     &              xdipole(ix-1),'<',posdip(1),'<',xdipole(ix)
+     &              ydipole(iy-1),'<',posdip(2),'<',ydipole(iy)
         write(6,*)'field at (jz-1):', 
-     &              f(ix-1,jz-1),field_tmp(jz-1),f(ix,jz-1)
+     &              f(iy-1,jz-1),field_tmp(jz-1),f(iy,jz-1)
         write(6,*)'field at (jz):',   
-     &              f(ix-1,jz), field_tmp(jz), f(ix,jz)
+     &              f(iy-1,jz), field_tmp(jz), f(iy,jz)
         write(6,*)'interp coeff A & B:',A,B
         write(6,*)'-------'
         write(6,*)'interp in z:', 
-     &              zdipole(jz-1),'<',posdip(3),'<',zdipole(jz)
+     &              zdipole(jz-1),'<',posdip(2),'<',zdipole(jz)
         write(6,*)'field at:',  
      &              field_tmp(jz-1),field(1)*1E3,field_tmp(jz)
         write(6,*)'interp coeff C & D:',C,D
