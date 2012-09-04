@@ -34,33 +34,23 @@ c    stop tracking electrons below 1 MeV in kinetic energy.
       integer volume_num, magnet_mate, beamline_mate
       real pars(9)
 
-c Now define the quadrapole
-C DJG: No quadrupole
-C DJG	call ugstmed (magnet_mate, 'Dipole$', VACUUM_MATE,
-C DJG	1		0, 1, dipole_field, TMAXFD, STEMAX, DEEMAX, EPSIL, 
-C DJG	2		STMIN, 0, 0)
-C DJG	pars(1) =  10.
-C DJG	pars(2) =  20.
-C DJG	pars(3) =  46. / 2.		! length of quad
-C DJG	call ugsvolu ('QUAD', 'TUBE ', magnet_mate, pars, 3, volume_num)
-C DJG	call gspos ('QUAD', 1, mother, 0., 0., 0., 0, 'ONLY')
-C DJG	call gsatt ('QUAD', 'COLO', GREEN)	! Change color of the Quad
-C DJG	call gsatt ('QUAD', 'SEEN', 1)		! Quad is visible
-
 c Now define the chicane
+
+C Note: field in ugstmed is the maximum field in the dipole. For the fieldmap,
+C best to set this to twice the "nominal" value to avoid problems.
 
       if (dipole_length .ne. 0.) then
          if (event_type_brem .ne. 0) then
             call ugstmed (beamline_mate, 'dipole vacuum$', MYVAC_MATE,
-     $           0, 1, dipole_field, TMAXFD, STEMAX, DEEMAX, EPSIL, 
+     $           0, 1, 2.0*dipole_field, TMAXFD, STEMAX, DEEMAX, EPSIL, 
      $           STMIN, 0, 0)
          else
             call ugstmed (beamline_mate, 'dipole vacuum$', VACUUM_MATE,
-     $           0, 1, dipole_field, TMAXFD, STEMAX, DEEMAX, EPSIL, 
+     $           0, 1, 2.0*dipole_field, TMAXFD, STEMAX, DEEMAX, EPSIL, 
      $           STMIN, 0, 0)
          endif
          call ugstmed (magnet_mate, 'dipole yoke$', IRON_MATE,
-     $        0, 1, dipole_field, TMAXFD, STEMAX, DEEMAX, EPSIL, 
+     $        0, 1, 2.0*dipole_field, TMAXFD, STEMAX, DEEMAX, EPSIL, 
      $        STMIN, 0, 0)
 
 c Stop electrons below 1 MeV, otherwise they curl up in the field
@@ -101,7 +91,6 @@ c         call gsatt ('DIPO', 'SEEN', 1)	! dipole is visible
 
 
 C DJG: First dipole
-cpat         pars(2) = chicane_drop - dipole_h/2.0
          pars(2) = chicane_drop - dipole_h/2.0 ! offset to account for sagitta
          pars(3) = - chicane_mid/2. - dipole_length 
      $             - chicane_drift - dipole_length/2.
@@ -110,29 +99,21 @@ c         call gspos ('DIPO', 1, mother, 0., pars(2), pars(3), 1, 'ONLY')
 
 C DJG: Second dipole
          pars(2) = 0.0+dipole_h/2.0
-cpat         pars(3) = -chicane_length/2. + dipole_length/2. + 
-cpat     $        chicane_drift + dipole_length
          pars(3) = -chicane_mid/2. - dipole_length/2.
 c         call gspos ('DIPO', 2, mother, 0., pars(2), pars(3), 2, 'ONLY')
          call gspos ('DIPO', 2, mother, 0., pars(2), pars(3), 0, 'ONLY')
 
 C DJG: Third dipole
          pars(2) = 0.0+dipole_h/2.0
-cpat         pars(3) = -chicane_length/2. + dipole_length/2. + 
-cpat     $       chicane_drift + dipole_length + chicane_mid + dipole_length
          pars(3) = chicane_mid/2. + dipole_length/2.
 c         call gspos ('DIPO', 3, mother, 0., pars(2), pars(3), 3, 'MANY')
          call gspos ('DIPO', 3, mother, 0., pars(2), pars(3), 0, 'ONLY')
 
 
 C DJG: Fourth dipole
-cpat         pars(2) = chicane_drop !+ dipole_h/2.0
          pars(2) = chicane_drop-dipole_h/2.0
          pars(3) = chicane_mid/2. + dipole_length 
      $             + chicane_drift + dipole_length/2.
-cpat         pars(3) = -chicane_length/2. + dipole_length/2. +
-cpat     $       chicane_drift + dipole_length + chicane_mid + dipole_length
-cpat     $       + chicane_drift + dipole_length
 c         call gspos ('DIPO', 4, mother, 0., pars(2), pars(3), 4, 'ONLY')
          call gspos ('DIPO', 4, mother, 0., pars(2), pars(3), 0, 'ONLY')
       endif
