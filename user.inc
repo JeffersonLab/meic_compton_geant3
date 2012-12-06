@@ -369,17 +369,17 @@ c -June 7, 2003
      4	      Ehit_pl1, Ehit_pl2, Ehit_pl3, Ehit_pl4
         common /ntuple/Egam_dep,nht,nht_pl1,nht_pl2,
      1           nht_pl3,nht_pl4,
-     2		 nstrip_pl1(92),nstrip_pl2(92),
-     3           nstrip_pl3(92),nstrip_pl4(92),
-     4		 Ehit(400),Ehit_pl1(92),Ehit_pl2(92),
-     5		 Ehit_pl3(92),Ehit_pl4(92),
+     2		 nstrip_pl1(96),nstrip_pl2(96),
+     3           nstrip_pl3(96),nstrip_pl4(96),
+     4		 Ehit(400),Ehit_pl1(96),Ehit_pl2(96),
+     5		 Ehit_pl3(96),Ehit_pl4(96),
      6           Ee_dep,vertx(3),vertp(3),Eparticle(100),
      7           wXSect,wLumin,apower,gam_rho,
      8           E_recoil,E_beam,egmax
 	character*700 chform
 	parameter (chform='Egam_dep:R,nht[0,400]:I,' //
-     1 		    'nht_pl1[0,92]:I,nht_pl2[0,92]:I,' //
-     2		    'nht_pl3[0,92]:I,nht_pl4[0,92]:I,' //
+     1 		    'nht_pl1[0,96]:I,nht_pl2[0,96]:I,' //
+     2		    'nht_pl3[0,96]:I,nht_pl4[0,96]:I,' //
      3		    'nstrip_pl1(nht_pl1):R,nstrip_pl2(nht_pl2):R,' //
      4   	    'nstrip_pl3(nht_pl3):R,nstrip_pl4(nht_pl4):R,' //
      4              'Ehit(nht):R,' //
