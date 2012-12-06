@@ -234,23 +234,10 @@ c
          call gphits ('*', '*')
       endif
 
-c First get the energy deposited in the suppression shield
-
-c      shield_energy = 0.
-c      do j = 1, NSHIELDS
-c         call gfhits ('SDET', shield_names(j), 1, 1, 10, 0,   
-c     $        numvs, tracks, numbv, Esum, mhits)
-c         do i = 1, mhits
-c	    shield_energy = shield_energy + Esum(i)
-c         enddo
-c      enddo
-
-
-c Now get the energy deposited in the energy measuring detectors
+c Get the energy deposited in the energy measuring detectors
       nstrip = int(detector_stripnumber)      
 
-c      do id = 1, 5*nstrip/96
-      do id = 1, 5
+      do id = 1, 5   ! loop over process type (i.e., Brem., Compton BS, Halo, Sync. or Source lines)
          nht          = 0
          nht_pl1      = 0.
          nht_pl2      = 0.
@@ -262,7 +249,7 @@ c      do id = 1, 5*nstrip/96
          do i=1,4*nstrip
             Ehit(i)   = 0.0
          enddo
-	 do i=1,5*nstrip/96
+	 do i=1,nstrip ! note that the index here is actually hit #
             nstrip_pl1(i) = 0.0
             nstrip_pl2(i) = 0.0
             nstrip_pl3(i) = 0.0
@@ -277,61 +264,62 @@ c         write(99,*) '#### START PROCESS A NEW EVENT ####'
          do it = 1, ntrack
 	    call gfkine(it, vertex, pvertex, particle_type,
      $                  vertex_number, user, num_user)
-	    if (user(1) .eq. id) then
+	    if (user(1) .eq. id) then                    ! check process type
+C              Check for hits in photon detector
                call gfhits('EDET', detect_names(1), 1, 1, MAX_HITS, 
      $                     it, numvs, tracks, numbv, Esum, nhits)
-             do i = 1, nhits
-                Egam_dep     = Esum(i)
-                total_energy = total_energy + Esum(i)
-c                write(6,*) 'detected hits in photon detector',
-c     $                      i,nhits,Esum(i),Egam_dep,it
-             enddo
-             !do j = 2, NDETECTS
-             call gfhits('EDET',detect_names(2),1,1, MAX_HITS,
+               do i = 1, nhits
+                  Egam_dep     =  Egam_dep + Esum(i) !total energy deposited in photon det.
+                  total_energy = total_energy + Esum(i)
+c                  if(nhits.gt.1) then
+c                   write(6,*) 'detected hits in photon detector',
+c     $                  i,nhits,Esum(i),Egam_dep,it,MAX_HITS
+c                  endif
+               enddo
+C              Check for hits in electron detector
+               call gfhits('EDET',detect_names(2),1,1, MAX_HITS,
      $                   it, numvs, tracks, numbv, Esum, nhits)
-
-
-             do i = 1, nhits
-                  nht          = nht + 1                     ! hit number
+               do i = 1, nhits !loop over hits
+                  nht          = nht + 1 ! hit number
                   if(numbv(i).le.nstrip .and. 
-     $                  numbv(i).ge.5) then            ! strips 1-4 are inactive      
-                           rand1 = grnd()
-                           nstr =  numbv(i)
-                           if(rand1.lt.stefpl(nstr)) then
-                  	      nht_pl1 = nht_pl1 + 1	! volume number = strip number of each hit
-                              nstrip_pl1(nht_pl1) = numbv(i)  
-			      Ehit_pl1(nht_pl1) = Esum(i) 
-                           endif
+     $                 numbv(i).ge.5) then ! strips 1-4 are inactive      
+                     rand1 = grnd()
+                     nstr =  numbv(i)
+                     if(rand1.lt.stefpl(nstr)) then ! check efficiency
+                        nht_pl1 = nht_pl1 + 1 ! volume number = strip number of each hit
+                        nstrip_pl1(nht_pl1) = numbv(i)  
+                        Ehit_pl1(nht_pl1) = Esum(i) 
+                     endif
 		  elseif(numbv(i).le.(2*nstrip) .and. 
-     $                  numbv(i).ge.(nstrip+5)) then
-                           rand2 = grnd()
-                           nstr =  numbv(i)
-                           if(rand2.lt.stefpl(nstr)) then
-			      nht_pl2 = nht_pl2 + 1
-			      nstrip_pl2(nht_pl2) = numbv(i) - nstrip
-			      Ehit_pl2(nht_pl2) = Esum(i) 
-                           endif
+     $                    numbv(i).ge.(nstrip+5)) then
+                     rand2 = grnd()
+                     nstr =  numbv(i)
+                     if(rand2.lt.stefpl(nstr)) then
+                        nht_pl2 = nht_pl2 + 1
+                        nstrip_pl2(nht_pl2) = numbv(i) - nstrip
+                        Ehit_pl2(nht_pl2) = Esum(i) 
+                     endif
 		  elseif(numbv(i).le.(3*nstrip) .and. 
-     $                  numbv(i).ge.((2*nstrip)+5)) then 
-                           rand3 = grnd()
-                           nstr =  numbv(i)
-                           if(rand3.lt.stefpl(nstr)) then
-			      nht_pl3 = nht_pl3 + 1
-			      nstrip_pl3(nht_pl3) = numbv(i) - (2*nstrip)
-			      Ehit_pl3(nht_pl3) = Esum(i) 
-                           endif
+     $                    numbv(i).ge.((2*nstrip)+5)) then 
+                     rand3 = grnd()
+                     nstr =  numbv(i)
+                     if(rand3.lt.stefpl(nstr)) then
+                        nht_pl3 = nht_pl3 + 1
+                        nstrip_pl3(nht_pl3) = numbv(i) - (2*nstrip)
+                        Ehit_pl3(nht_pl3) = Esum(i) 
+                     endif
 		  elseif(numbv(i).le.(4*nstrip) .and. 
-     $                  numbv(i).ge.((3*nstrip)+5)) then
-                           rand4 = grnd()
-                           nstr =  numbv(i)
-                           if(rand4.lt.stefpl(nstr)) then
-			      nht_pl4 = nht_pl4 + 1
-			      nstrip_pl4(nht_pl4) = numbv(i) - (3*nstrip)
-			      Ehit_pl4(nht_pl4) = Esum(i) 
-                           endif
+     $                    numbv(i).ge.((3*nstrip)+5)) then
+                     rand4 = grnd()
+                     nstr =  numbv(i)
+                     if(rand4.lt.stefpl(nstr)) then
+                        nht_pl4 = nht_pl4 + 1
+                        nstrip_pl4(nht_pl4) = numbv(i) - (3*nstrip)
+                        Ehit_pl4(nht_pl4) = Esum(i) 
+                     endif
 		  endif
 		  		  
-		  Ehit(nht)    = Esum(i)                     ! energy deposit per hit
+		  Ehit(nht)    = Esum(i)                     ! energy deposit for this hit
                   Ee_dep       = Ee_dep + Esum(i)            ! total energy deposited in electron detector
                   total_energy = total_energy + Esum(i)      ! total energy deposited = Egamma+Eedeposit
 c                  write(6,*) 'detected electron',ntrack,i,nhits,nht,
@@ -339,7 +327,7 @@ c     $                       numbv(i),Esum(i),
 c     $                       plane(nht),Ehit(nht),
 c     $                       Ee_dep
                enddo
-
+               
 
 
                if (particle_type.eq.1) then 
@@ -348,8 +336,8 @@ c     $                       Ee_dep
                   mass(particle_type) = mass_electron
                endif
                Eparticle(particle_type) = sqrt(pvertex(1)**2 
-     &                         + pvertex(2)**2 + pvertex(3)**2 
-     &                         + mass(particle_type)**2)
+     &              + pvertex(2)**2 + pvertex(3)**2 
+     &              + mass(particle_type)**2)
 
 c               write(6,*) '--- For track ',it,' of ',ntrack 
 c               write(6,*) 'position: ', vertex(1), vertex(2), vertex(3)
@@ -395,15 +383,15 @@ c	     endif
                egmax    = user(6)
                E_recoil = user(7)
                E_beam   = user(8)
-	    endif
-         enddo
+	    endif  ! end check on process type
+         enddo     ! end loop over tracks
 
          if (hexist(id) .and. total_energy .ge. 1e-6) then
 c            write(6,*)'GO AHEAD !', total_energy,Eparticle(1),
 c     $                              Eparticle(3)
 	    call hfnt(id)  ! fill ntuple
          endif
-      enddo
+      enddo   ! end loop over process types
 
       end
 
