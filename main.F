@@ -1,10 +1,10 @@
       implicit none
-      real q,hq
+      real q,h
       integer ispace,hspace
       parameter (ispace=2000000)
       parameter (hspace=500000)
       common /gcbank/ q(ispace)
-      common /pawc/ hq(hspace)
+      common /pawc/ h(hspace)
       real secmax
       parameter (secmax=300000.)
       integer istat,icycle
