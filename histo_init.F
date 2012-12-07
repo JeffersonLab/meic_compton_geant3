@@ -16,13 +16,23 @@ c  - all ntuples have the same structure
 	include 'user.inc'
 
 	integer iostat
+	integer lrec
+	integer IQUEST(100)
 
- 	call hropen (90, 'HISTOS', 'compton.hbook', 'N', 4096, iostat)
+C Use this if you need really big ntuples
+	COMMON/QUEST/IQUEST
+	lrec=8191
+	IQUEST(10)=65000
+ 	call hropen (90, 'HISTOS', 'ntuples/compton.hbook','NQ', 
+     >   lrec, iostat)
+c 	call hropen (90, 'HISTOS', 'ntuples/compton.hbook','N', 
+c     >   4096, iostat)
 	if (iostat .ne. 0) then
 	  write (*,*) ' Error in hropen ', iostat
 	  return
 	endif
 
+	call hbset('BSIZE',8176,iostat)
 	if (event_type_brem .ne. 0) then
 	  call hbnt(1,'Beamline bremsstrahlung products',' ')
 	  call hbname(1,'brem',Egam_dep,chform)
