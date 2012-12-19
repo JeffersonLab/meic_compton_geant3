@@ -1,8 +1,13 @@
 ## RHEL5 on Dave's desktop
 #CERN_ROOT = /apps/cernlib/i386_rhel5/2005/
 #CERN_LEVEL = 2005
-CERN_ROOT = /usr/lib64/cernlib/2006
-CERN_LEVEL = 2006
+#64 bit CentOS
+#IMPORTANT: make sure you do "setup cernlib/2005" before compiling
+#This sets appropriate cern environment variables to point to the version
+#compiled by SAW, rather than the distributed version
+#CERN_ROOT = /usr/lib64/cernlib/2006
+CERN_ROOT = /site/cernlib/x86_64_rhel6/2005
+CERN_LEVEL = 2005
 
 INTER = interactive
 
@@ -74,7 +79,7 @@ ifeq ($(MYOS),Linux)
  else
   FC = gfortran
   LIBS    = -L/usr/lib64 -lXpm -lXm -lXt -lSM -lICE -lXext -lX11 -lXp -ldl
-  FFLAGS = -g -I. -I$(CERN_ROOT)/include -I/apps/cernlib/x86_64_rhel6/2005/include -DCERNLIB_TYPE -DCERNLIB_MOTIF -D_FILE_OFFSET_BITS=64
+  FFLAGS = -g -I. -I$(CERN_ROOT)/include -DCERNLIB_TYPE -DCERNLIB_MOTIF -D_FILE_OFFSET_BITS=64
   LDXOPTS = -Wl,-uuginit_,-uuglast_,-ugustep_,-ugukine_,-ugudigi,-ugxcs_,-export-dynamic
  endif
 endif
@@ -82,7 +87,7 @@ endif
 all: compton++ compton
 
 compton++: $(OBJINTER) $(OBJ) Makefile
-	$(FC) -o $@ gxint321.f $(OBJINTER) $(OBJ) -L$(CERN_ROOT)/lib `cernlib -v $(CERN_LEVEL) geant321 pawlib graflib/Motif packlib mathlib`
+	$(FC) -o $@ gxint321.f $(OBJINTER) $(OBJ) -L$(CERN_ROOT)/lib/ `cernlib -v $(CERN_LEVEL) geant321 pawlib graflib/Motif packlib mathlib`
 
 #compton: main.F $(OBJ) Makefile
 #	$(FC) $(FFLAGS) -o $@ main.F $(OBJ) $(CERNLIBS) $(LIBS)
