@@ -330,14 +330,16 @@ c     $                       Ee_dep
                
 
 
-               if (particle_type.eq.1) then 
+               if (particle_type.eq.1) then  ! photon
                   mass(particle_type) = 0.0
-               elseif (particle_type.eq.3) then 
+               elseif (particle_type.eq.3) then  ! electron
                   mass(particle_type) = mass_electron
                endif
-               Eparticle(particle_type) = sqrt(pvertex(1)**2 
-     &              + pvertex(2)**2 + pvertex(3)**2 
-     &              + mass(particle_type)**2)
+               if(particle_type.lt.4) then
+                  Eparticle(particle_type) = sqrt(pvertex(1)**2 
+     &                 + pvertex(2)**2 + pvertex(3)**2 
+     &                 + mass(particle_type)**2)
+               endif
 
 c               write(6,*) '--- For track ',it,' of ',ntrack 
 c               write(6,*) 'position: ', vertex(1), vertex(2), vertex(3)
@@ -386,7 +388,10 @@ c	     endif
 	    endif  ! end check on process type
          enddo     ! end loop over tracks
 
-         if (hexist(id) .and. total_energy .ge. 1e-6) then
+c         if (hexist(id) .and. total_energy .ge. 1e-6) then
+C DG Get rid of the energy cut for now. Almost every event passes, and it might
+C DG introduce bias.
+         if (hexist(id)) then
 c            write(6,*)'GO AHEAD !', total_energy,Eparticle(1),
 c     $                              Eparticle(3)
 	    call hfnt(id)  ! fill ntuple
