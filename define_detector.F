@@ -93,13 +93,29 @@ c Now define the DETEctor
 
       call ugstmed(det_cover_mate,'DETEctor$',int(hpge_cover_mate+0.5),
      $     0,0,FIELDM,TMAXFD,STEMAX,DEEMAX,EPSIL,STMIN,0,0)
-      pars(1) =  0.0            ! inner radius
-      pars(2) =  hpge_diameter / 2. + hpge_cover_depth ! Outer radius
-      pars(3) =  (hpge_depth + hpge_dead_depth) / 2. + hpge_cover_depth
-      call ugsvolu('DETE','TUBE',det_cover_mate,pars,3,volume_num)
+C Tube for GSO
+c      pars(1) =  0.0            ! inner radius
+c      pars(2) =  hpge_diameter / 2. + hpge_cover_depth ! Outer radius
+c      pars(3) =  (hpge_depth + hpge_dead_depth) / 2. + hpge_cover_depth
+c      call ugsvolu('DETE','TUBE',det_cover_mate,pars,3,volume_num)
+C Box for lead-tungstate
+c      pars(1) =  hpge_diameter/2. + hpge_cover_depth !x half-width
+c      pars(2) =  hpge_diameter / 2. + hpge_cover_depth ! y half-width
+c      pars(3) =  (hpge_depth + hpge_dead_depth) / 2. + hpge_cover_depth
+c      call ugsvolu('DETE','BOX ',det_cover_mate,pars,3,volume_num)
+c      pars(1) = hpge_offset_x
+c      pars(2) = hpge_offset_y
+c      pars(3) = pars(3) + hpge_distance
+
+C Change to slab in front of detecctor
+      pars(1) =  hpge_diameter/2. + 1.0 !x half-width
+      pars(2) =  hpge_diameter / 2. + 1.0 ! y half-width
+      pars(3) =  hpge_cover_depth/2.
+      call ugsvolu('DETE','BOX ',det_cover_mate,pars,3,volume_num)
       pars(1) = hpge_offset_x
       pars(2) = hpge_offset_y
-      pars(3) = pars(3) + hpge_distance
+      pars(3) = hpge_distance - pars(3) - 0.5
+
       call gspos('DETE',1,mother,pars(1),pars(2),pars(3),0,'ONLY')
       call gsatt('DETE', 'COLO', BLUE) ! Change color of the DETEctor
       call gsatt('DETE', 'SEEN', 1) ! DETEctor is visible
@@ -110,11 +126,22 @@ c Now fill up the DETEctor with sensitive material
       material =  int(hpge_material)
       call ugstmed (det_mate, 'DETEctor$', material,
      $     1, 0, FIELDM, TMAXFD, STEMAX, DEEMAX, EPSIL, STMIN, 0, 0)
-      pars(1) =  0.0
+C Tube for GSO
+c      pars(1) =  0.0
+c      pars(2) =  hpge_diameter / 2.
+c      pars(3) =  hpge_depth / 2.
+c      call ugsvolu('DETI', 'TUBE', det_mate, pars, 3, volume_num)
+C Box for lead-tungstate
+      pars(1) =  hpge_diameter / 2.
       pars(2) =  hpge_diameter / 2.
       pars(3) =  hpge_depth / 2.
-      call ugsvolu('DETI', 'TUBE', det_mate, pars, 3, volume_num)
-      call gspos('DETI', 1,'DETE', 0., 0., hpge_cover_depth / 2.,
+      call ugsvolu('DETI', 'BOX ', det_mate, pars, 3, volume_num)
+c      call gspos('DETI', 1,'DETE', 0., 0., hpge_cover_depth / 2.,
+c     $             0, 'ONLY')
+      pars(1) = hpge_offset_x
+      pars(2) = hpge_offset_y
+      pars(3) = hpge_distance + pars(3)
+      call gspos('DETI', 1,mother, pars(1), pars(2), pars(3),
      $             0, 'ONLY')
       call gsatt ('DETI', 'COLO', GREEN) ! Change color of the DETEctor
       call gsatt ('DETI', 'SEEN', 1) ! DETEctor is visible
@@ -166,7 +193,7 @@ c         write(98,*)'zdet= ',pars(3),' cm'
          call gsatt ('EBOX', 'COLO', BLUE) ! Change color of the detector
          call gsatt ('EBOX', 'SEEN', 1)     ! recoil detector is visible
 
-         ! make 4 planes of 96 sensitive strips
+         ! make 4 planes of 96 (or other number) sensitive strips
          nplane = int(detector_planenumber)
          nstrip = int(detector_stripnumber)
 
@@ -174,9 +201,8 @@ c         write(98,*)'zdet= ',pars(3),' cm'
          call ugstmed (recoil_mate, 'recoil detector$', material,
      1                 1, 0, FIELDM, TMAXFD, STEMAX, DEEMAX, EPSIL, 
      2                 STMIN, 0, 0)
-
          pars(1) = 0.5 * detector_width
-         pars(2) = 0.5 * detector_stripwidth * 96/nstrip
+         pars(2) = 0.5 * detector_stripwidth ! * 96/nstrip
          pars(3) = 0.5 * detector_thickness 
          call ugsvolu('ELED','BOX ',recoil_mate, pars, 3,volume_num)
          
@@ -191,8 +217,8 @@ c         write(98,*)'zdet= ',pars(3),' cm'
                    stripID = nstrip*(iplane-1.0) + istrip
   	   	   pars(1) = 0.0
                    pars(2) = -0.5*detector_height 
-     >                + (istrip-0.5) * detector_stripwidth * 96/nstrip
-     >                + (istrip-1.0) * detector_stripspace * 96/nstrip
+     >                + (istrip-0.5) * detector_stripwidth ! * 96/nstrip
+     >                + (istrip-1.0) * detector_stripspace ! * 96/nstrip
      >  	      + vshift
                    pars(3) = -0.5*sensitive_thick+0.5*detector_thickness
      >                + (iplane-1)*detector_thickness
@@ -211,7 +237,7 @@ c         write(98,*)'zdet= ',pars(3),' cm'
 c make gaps filled with diamond but insensitive
 
          pars(1) = 0.5 * detector_width
-         pars(2) = 0.5 * detector_stripspace * 96/nstrip
+         pars(2) = 0.5 * detector_stripspace ! * 96/nstrip
          pars(3) = 0.5 * detector_thickness 
          call ugsvolu('ELES','BOX ',recoil_mate, pars, 3,volume_num)
          
@@ -227,8 +253,8 @@ c make gaps filled with diamond but insensitive
                    stripID = nstrip*(iplane-1.0) + istrip
   	   	   pars(1) = 0.0
                    pars(2) = -0.5*detector_height 
-     >                + (istrip-0.5) * detector_stripspace * 96/nstrip
-     >                + (istrip-1.0) * detector_stripwidth * 96/nstrip
+     >                + (istrip-0.5) * detector_stripspace ! * 96/nstrip
+     >                + (istrip-1.0) * detector_stripwidth ! * 96/nstrip
      >  	      + vshift
                    pars(3) = -0.5*sensitive_thick+0.5*detector_thickness
      >                + (iplane-1)*detector_thickness
