@@ -79,7 +79,7 @@ ifeq ($(MYOS),Linux)
  else
   FC = gfortran
   LIBS    = -L/usr/lib64 -lXpm -lXm -lXt -lSM -lICE -lXext -lX11 -lXp -ldl
-  FFLAGS = -g -I. -I$(CERN_ROOT)/include -DCERNLIB_TYPE -DCERNLIB_MOTIF -D_FILE_OFFSET_BITS=64
+  FFLAGS = -g -fno-automatic -fno-second-underscore -I. -I$(CERN_ROOT)/include -DCERNLIB_TYPE -DCERNLIB_MOTIF -D_FILE_OFFSET_BITS=64
   LDXOPTS = -Wl,-uuginit_,-uuglast_,-ugustep_,-ugukine_,-ugudigi,-ugxcs_,-export-dynamic
  endif
 endif
@@ -87,7 +87,10 @@ endif
 all: compton++ compton
 
 compton++: $(OBJINTER) $(OBJ) Makefile
-	$(FC) -o $@ gxint321.f $(OBJINTER) $(OBJ) -L$(CERN_ROOT)/lib/ `cernlib -v $(CERN_LEVEL) geant321 pawlib graflib/Motif packlib mathlib`
+	$(FC) $(FFLAGS) -o $@ gxint321.F $(OBJINTER) $(OBJ) $(LIBS) `cernlib -v $(CERN_LEVEL) geant321 pawlib graflib grafX11 packlib mathlib`
+
+#compton++: $(OBJINTER) $(OBJ) Makefile
+#	$(FC) -o $@ gxint321.f $(OBJINTER) $(OBJ) -L$(CERN_ROOT)/lib/ `cernlib -v $(CERN_LEVEL) geant321 pawlib graflib/Motif packlib mathlib`
 
 #compton: main.F $(OBJ) Makefile
 #	$(FC) $(FFLAGS) -o $@ main.F $(OBJ) $(CERNLIBS) $(LIBS)
