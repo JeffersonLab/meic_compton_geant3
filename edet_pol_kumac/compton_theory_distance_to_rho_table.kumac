@@ -28,7 +28,7 @@ ve/cr lmag(1) r [lmag]
 ve/cr ldet(1) r [ldet]
 ve/cr planen(1) r [plane]
 ve/cr plgap(1) r [planespace]
-ve/cr edgstr(1) r [edge_strip]
+ve/cr edgstr(1) r [edge_strip] 
 ve/cr strwid(1) r [strip_width]
 ve/cr nstrips(1) r [nstrips]
 ve/cr maxdis(1) r [comp_edge]
@@ -63,7 +63,8 @@ mess Strip Shift =      [strip_shift]
 
 
 *       sigma const=hbarc*1.0E-15/(2*5.788381E-14*me)
-	sigma const=10/3
+*const = 1/(speed of light in m/ns)
+	sigma const = 10/2.99792458
 	sigma thdet=thdet*pi/180. 
 	sigma alpha=1.0/137.0
 	sigma re=alpha*hbarc/me
@@ -81,11 +82,18 @@ mess Strip Shift =      [strip_shift]
         mess 'Cheesy Poofs'
         sigma th=theta*180/pi
         ve/print th
+	ve/print lmag
+	ve/print r
+	ve/print mfield
 	sigma h=r*(1-cos(theta))
-
+	ve/print theta
 *assume beam hits in middle of max strip
 	sigma dpiv=strwid*(edgstr-(nstrips/2)-0.5)+strsh
 	sigma d0=maxdis/1000-dpiv
+
+*-->new evaluation
+*	sigma dpiv=strwid*(edgstr+0.5) +0.0001 +strsh
+*	sigma d0 = dpiv
 
 *outgoing photon// max recoil photon energy (GeV)
         sigma a=1/(1+4*k*gamma/me) 
@@ -93,16 +101,21 @@ mess Strip Shift =      [strip_shift]
 	ve/copy kmax kkk
 	
       do i=1,1000	
-	sigma p_edge=p_beam-kkk         
+	sigma p_edge=p_beam +k -kkk     
 	sigma r_edge=const*p_edge/mfield
         sigma th_edge=asin(lmag/r_edge)
 	sigma hprime=r_edge*(1-cos(th_edge))
 	sigma ldet2=ldet+(planen-2.5)*plgap*cos(theta)
 
+*->Previous evaluation
 	sigma a=(hprime-h)+(ldet2+d0*sin(thdet))*(tan(th_edge)-tan(theta))
 	sigma b=1-sin(thdet)*cos(theta)*(tan(th_edge)-tan(theta))
 	sigma d=a*cos(theta)/(b*cos(thdet-theta))
-
+*-->new evaluation
+*	sigma a=(hprime-h)+(ldet2-d0*sin(thdet))*(tan(th_edge)-tan(theta))
+*	sigma b=a*sin(thdet)*(th_edge-thdet) 
+*	sigma d=a*cos(thdet) - b
+*
  	sigma maxdist=d
 
 	sigma rho=kkk/kmax
