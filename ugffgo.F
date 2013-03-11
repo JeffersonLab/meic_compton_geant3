@@ -142,7 +142,7 @@ c Define the radioactive source card
 c Define the random number generator seed card
 
       call ffkey ('SEEDS', seeds, 3, 'INTEGER') !Define seeds for random number generator
-      seeds_1 = 2465761579
+      seeds_1 = 246576157
       seeds_2 = 564186545
       seeds_Iseq = 42
 
