@@ -87,7 +87,7 @@ endif
 all: compton++ compton
 
 compton++: $(OBJINTER) $(OBJ) Makefile
-	$(FC) $(FFLAGS) -o $@ gxint321.F $(OBJINTER) $(OBJ) $(LIBS) `cernlib -v $(CERN_LEVEL) geant321 pawlib graflib grafX11 packlib mathlib`
+	$(FC) $(FFLAGS) -o $@ gxint321.f $(OBJINTER) $(OBJ) $(LIBS) `cernlib -v $(CERN_LEVEL) geant321 pawlib graflib grafX11 packlib mathlib`
 
 #compton++: $(OBJINTER) $(OBJ) Makefile
 #	$(FC) -o $@ gxint321.f $(OBJINTER) $(OBJ) -L$(CERN_ROOT)/lib/ `cernlib -v $(CERN_LEVEL) geant321 pawlib graflib/Motif packlib mathlib`
