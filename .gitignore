@@ -1,0 +1,16 @@
+# Executables, object files and other makefile targets
+compton
+compton++
+*.o
+*.tgz
+
+# Editor lint
+.#*
+*~
+
+# Paw lint
+paw.metafile
+last.kumac
+last.kumacold
+
+
