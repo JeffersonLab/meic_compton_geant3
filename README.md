@@ -1,12 +1,13 @@
-                Compton Polarimeter Simulation for Qweak
-		----------------------------------------
+Compton Polarimeter Simulation for Qweak
+========================================
 
-	- R.T. Jones, Univ of Connecticut (Qweak maintainer)
-	- D. Gaskell, JLab (Hall C modifications)
-	- Pat Welch, Univ of Oregon (original author)
+* R.T. Jones, Univ of Connecticut (Qweak maintainer)
+* D. Gaskell, JLab (Hall C modifications)
+* Pat Welch, Univ of Oregon (original author)
 
 
-I. Simulation Overview
+Simulation Overview
+-------------------
 
 This simulation contains the setup for a Compton chicane and detectors
 for a Compton backscatter polarimeter.  It is based on the CERNLIB package
@@ -19,11 +20,11 @@ that is the standard way that Geant3 obtains its settings.  In addition
 to the standard Geant controls in control.in, a custom set of keys have
 been defined to set up specific aspects of the polarimeter.
 
-   A. bremsstrahlung (interactions between primary beam and residual gas)
-   B. backscatter (Compton scattering between laser and primary beam)
-   C. beam halo (tails of the electron beam that sometimes scrape)
-   D. synchrotron (radiation from primary beam in dipoles)
-   E. source lines (radioactive source for continuous calibration)
+1. bremsstrahlung (interactions between primary beam and residual gas)
+2. backscatter (Compton scattering between laser and primary beam)
+3. beam halo (tails of the electron beam that sometimes scrape)
+4. synchrotron (radiation from primary beam in dipoles)
+5. source lines (radioactive source for continuous calibration)
 
 The above five basic simulation modes can be individually turned on/off
 using the control.in TYPE line.  In principle they are independent and
@@ -36,7 +37,8 @@ As a result it is recommended that bremsstrahlung simulations be carried
 out in separate runs from the other processes.
 
 
-II. Electron Beam
+Electron Beam
+-------------
 
 The electron beam is described by a Gaussian core surrounded by a diffuse
 halo with a power-law radial and angulr dependence.  The core Gaussian is
@@ -45,7 +47,8 @@ the entrance to the chicane.  This generation is done in genbeam().  The halo
 is produced in genhalo().
 
 
-III. Output
+Output
+------
 
 The output from the simulation is provided in the form of hbook ntuples.
 These ntuples can be interpreted using paw, to produce histograms of the
@@ -53,18 +56,19 @@ results.  Separate ntuples are produced for each of the above 5 simulation
 modes.  The ntuple titles indicate the mode that produced them.  Each ntuple
 cotains the following information.
 
-   A. vertx(1..3) - vertex origin of primary track (cm)
-   B. vertp(1..3) - vertex momentum of primary track (cm)
-   C. Egamma - total energy deposited in gamma detector (GeV)
-   D. nstrips - total number of microstrips hit in electron detector
-   E. strip(1..nstrips) - index of microstrip i, closest to beam =1
-   F. Estrip(1..nstrips) - energy deposited in microstrip i (GeV)
-   G. wXSect - cross section weight factor (see next section)
-   H. wLumin - cross section weight factor (see next section)
-   I. apower - polarization asymmetry for this process
+1. vertx(1..3) - vertex origin of primary track (cm)
+2. vertp(1..3) - vertex momentum of primary track (cm)
+3. Egamma - total energy deposited in gamma detector (GeV)
+4. nstrips - total number of microstrips hit in electron detector
+5. strip(1..nstrips) - index of microstrip i, closest to beam =1
+6. Estrip(1..nstrips) - energy deposited in microstrip i (GeV)
+7. wXSect - cross section weight factor (see next section)
+8. wLumin - cross section weight factor (see next section)
+9. apower - polarization asymmetry for this process
 
 
-IV. Normalization
+Normalization
+-------------
 
 The backscatter simulation produces one Compton gamma per event.  This is
 artificial in the sense that you get the same number of backscatters no
@@ -75,9 +79,9 @@ demonstrated by the diversity of information that can be extracted from the
 same data set by using different combinations of weights.  In the output
 each event is provided with 3 weight factors.
 
-   A. cross section weight (wXSect)
-   B. luminosity weight (wLumin)
-   C. polarization asymmetry (apower)
+1. cross section weight (wXSect)
+2. luminosity weight (wLumin)
+3. polarization asymmetry (apower)
 
 The generator produces Compton scattering with a uniform angular distribution
 in the cm frame; to correct for the Compton differential cross section you
@@ -96,7 +100,8 @@ correction necessary to convert counts to rates.  In general the apower
 for background processes is zero.
 
 
-V. Beam-Laser Intersection
+Beam-Laser Intersection
+-----------------------
 
 The luminosity of the beam-laser crossing has to be calculated by the Monte
 Carlo because it is a numerical integral for the general case.  The transverse
@@ -133,7 +138,8 @@ modes such as bremsstrahlung and synchrotron radiation, electrons are tracked
 from the beginning of the chicane.
 
 
-VI. Detector Response
+Detector Response
+-----------------
 
 The response of the detector to energy deposited in it is not a part of
 this simulation.  It should be included as a part of the subsequent
@@ -143,7 +149,8 @@ the entire simulation.
 response
 
 
-VII. Building Executables
+Building Executables
+--------------------
 
 In directory wherein lies this README, locate the Makefile.  Open it in an
 editor and check that the declarations of CERN_ROOT is correct for your
@@ -153,8 +160,8 @@ there are problems on the next step, go back and look at the section that
 applies to your environment and make the necessary changes.  To build the
 executables, simply type the following commands.
 
-  A. make compton
-  B. make compton++
+* make compton
+* make compton++
 
 The first is the standard batch version of Geant and the second is the
 interactive version.  When you start up the interactive version, instead
@@ -164,7 +171,8 @@ extensions.  This environment is useful for making plots and drawing
 pictures of the geometry.
 
 
-VIII. Directory Listing
+Directory Listing
+-----------------
 
 main.F		standard Geant3 main program
 uginit.F	standard Geant3 initialization
