@@ -1,3 +1,10 @@
+Compton Polarimeter Simulation for mEIC
+========================================
+The starting point for this simulation is the Qweak simulation described below.
+To first order, I will try to put in the appropriate geometry for the low Q2
+tagger.
+
+
 Compton Polarimeter Simulation for Qweak
 ========================================
 
