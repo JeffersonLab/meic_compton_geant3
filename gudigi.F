@@ -268,12 +268,16 @@ c         write(99,*) '#### START PROCESS A NEW EVENT ####'
 C              Check for hits in photon detector
                call gfhits('EDET', detect_names(1), 1, 1, MAX_HITS, 
      $                     it, numvs, tracks, numbv, Esum, nhits)
+c                  if(nhits.ge.1) then
+c                   write(6,*) 'detected hits in photon detector',
+c     $                  nhits,it,MAX_HITS
+c                  endif
                do i = 1, nhits
                   Egam_dep     =  Egam_dep + Esum(i) !total energy deposited in photon det.
                   total_energy = total_energy + Esum(i)
-c                  if(nhits.gt.1) then
-c                   write(6,*) 'detected hits in photon detector',
-c     $                  i,nhits,Esum(i),Egam_dep,it,MAX_HITS
+c                  if(nhits.ge.1) then
+c                   write(6,*) 'energy deposited in this hit',
+c     $                  i,Esum(i)
 c                  endif
                enddo
 C              Check for hits in electron detector
@@ -340,6 +344,9 @@ c     $                       Ee_dep
      &                 + pvertex(2)**2 + pvertex(3)**2 
      &                 + mass(particle_type)**2)
                endif
+
+c               write(6,*) 'particle type, Eparticle',particle_type,
+c     >                    Eparticle(particle_type)
 
 c               write(6,*) '--- For track ',it,' of ',ntrack 
 c               write(6,*) 'position: ', vertex(1), vertex(2), vertex(3)

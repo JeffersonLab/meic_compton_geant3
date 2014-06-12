@@ -48,7 +48,7 @@ c	generate Synchrotron (0-> no, !0 -> yes)
 c	generate source lines (0 -> no, !0 -> yes)
 c
 c
-TYPE 0 1 0 0 0
+TYPE 1 0 0 0 0
 c	
 c                                                                              
 c BEAM:
@@ -64,7 +64,7 @@ c	beta y of beam at exit to straight section in m
 c	emittance of beam in m-radians
 c	electron beam polarization
 c
-BEAM 1.159 10.0e-6 180. 8. 8. 8. 8. 8. 8. 4.4e-10 0.8500
+BEAM 3.0 10.0e-6 1.0E6 363.6 204.6 363.6 204.6 363.6 204.6 4.4e-10 0.8500
 c
 c
 c HALO:
@@ -79,15 +79,14 @@ c
 c DIPOLE:
 c	length of the dipole in cm (0 -> no dipole)
 c	height of the dipole in cm  ! was 4.125in before adjusting
-c       current in A
-c       use field map (1=yes, 0=no)
-c
+c       bend angle (degrees)
+c       use field map
 C
 c DIPOLE 125. 10.4775 6.93932413
 c DIPOLE 125. 10.625
 c DIPOLE 125. 20.955 103.047
 c DIPOLE 125. 20.955 104.697
- DIPOLE 125. 20.955 103.5 1
+ DIPOLE 300.0 20.955 2.29 0
 c
 c CHICANE:
 c	length of chicane (m) 
@@ -95,13 +94,13 @@ c	length of center region between d2 and d3 (m)
 c       length of drift between d1 and d2 (d3 and d4)
 c       vertical drop from d1 to d2 (cm)
 C
- CHICANE 11.1 2.2 1.95 57.00
+ CHICANE 22.2 2.2 4.0 28.78721
 c
 c FOIL:
 c	thickness of the foil in microns (0-> no foil)
 c	type of material (11->copper)
 c
-FOIL 100.0 11.
+FOIL 1000.0 11.
 c
 c LASER:
 c	wavelength of laser in microns
@@ -135,13 +134,13 @@ c	detector rotation angle about the x axis(degrees)     10.137686
 c       detector roll angle about the y axis (degrees)		0.0  Not yet active
 c       detector roll angle about the z axis (degrees)          0.0  Not yet active
 c
-DETECTOR 2.1 1.92 500. 180. 20. 96. 1.0 4 0. 8.0 24.5 34 10.3 0. 0.
+DETECTOR 2.1 1.92 500. 180. 20. 96. 1.0 4 0. 9.0 24.5 34 2.29 0. 0.
 c
 c HPGERMANIUM:
 c	distance from crossing point (m)
 c	displacement from axis in x (cm)
 c	displacement from axis in y (cm)
-c	diameter of active detector in cm
+c	width of active detector in cm (assumed square)
 c       depth of active detector in cm
 c	thickness of inactive layer in cm
 c	material id for cover (9 -> alumnimum)
@@ -155,7 +154,7 @@ c			4-> VU with signal from middle and BGO suppression
 c			5-> VU with signal from back and BGO suppression
 c
 c
-HPGERMANIUM 4.3 0 0 10.0 30.0 0.01 9 0.1 0.1 30 1 
+HPGERMANIUM 7.9 0 0 10.0 40.0 0.01 9 0.1 0.1 32 1 
 c
 c
 c SUPPRESSION:

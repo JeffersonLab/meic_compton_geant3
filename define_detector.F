@@ -46,7 +46,7 @@ c
       data names/'Esum'/
       data nbits/32/
       data orig/0/
-      data fact/1e9/
+      data fact/1e8/
       real pars(9)
       integer edetpos, istrip,nstrip,ngap,iplane,nplane, stripID
       real thetab,le
@@ -178,6 +178,7 @@ c  detector_offset: position of the lower edge of the detector above the main el
 
          call ugsvolu('EBOX', 'BOX ', recoil_vac, pars, 3, volume_num)
          le      = chicane_drift + detector_position 
+C Position center of box, not 1st plane
          pars(1) = 0.
          pars(2) = dipole_h + le*tan(thetab) 
      >             - detector_planeoffset 
@@ -186,7 +187,7 @@ c  detector_offset: position of the lower edge of the detector above the main el
          pars(2) = pars(2) !* cos(thetab)
          pars(3) = 0.5*chicane_mid + dipole_length
      >             + chicane_drift + detector_position
-     >             + 0.5 * sensitive_thick 
+c     >             + 0.5 * sensitive_thick 
 c         write(98,*)'ydet= ',pars(2),' cm'
 c         write(98,*)'zdet= ',pars(3),' cm'
          call gspos ('EBOX',1,mother,pars(1),pars(2),pars(3),8,'MANY')
@@ -220,9 +221,11 @@ c         write(98,*)'zdet= ',pars(3),' cm'
      >                + (istrip-0.5) * detector_stripwidth ! * 96/nstrip
      >                + (istrip-1.0) * detector_stripspace ! * 96/nstrip
      >  	      + vshift
-                   pars(3) = -0.5*sensitive_thick+0.5*detector_thickness
-     >                + (iplane-1)*detector_thickness
-     >                + (iplane-1)*detector_planespace
+
+                   pars(3) = (iplane-2.5)*detector_planespace
+c                   pars(3) = -0.5*sensitive_thick+0.5*detector_thickness
+c     >                + (iplane-1)*detector_thickness
+c     >                + (iplane-1)*detector_planespace
                    call gspos ('ELED',stripID,'EBOX',pars(1),pars(2),
      >                pars(3),0,'ONLY')
             enddo
@@ -253,12 +256,14 @@ c make gaps filled with diamond but insensitive
                    stripID = nstrip*(iplane-1.0) + istrip
   	   	   pars(1) = 0.0
                    pars(2) = -0.5*detector_height 
-     >                + (istrip-0.5) * detector_stripspace ! * 96/nstrip
+c     >                + (istrip-0.5) * detector_stripspace ! * 96/nstrip
+     >                + (istrip-1.5) * detector_stripspace ! * 96/nstrip
      >                + (istrip-1.0) * detector_stripwidth ! * 96/nstrip
      >  	      + vshift
-                   pars(3) = -0.5*sensitive_thick+0.5*detector_thickness
-     >                + (iplane-1)*detector_thickness
-     >                + (iplane-1)*detector_planespace
+c                   pars(3) = -0.5*sensitive_thick+0.5*detector_thickness
+c     >                + (iplane-1)*detector_thickness
+c     >                + (iplane-1)*detector_planespace
+                   pars(3) = (iplane-2.5)*detector_planespace
                    call gspos ('ELES',stripID,'EBOX',pars(1),pars(2),
      >                pars(3),0,'ONLY')
             enddo
