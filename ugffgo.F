@@ -109,7 +109,7 @@ c Define the dipole input card
 
       dipole_length = 0.     ! cm
       dipole_height = 0.     ! cm
-      dipole_current= 100.0  ! A
+      dipole_bend= 2.29  ! deg.
       dipole_map=0
 c      dipole_rho    = 1.    ! m
 
@@ -225,19 +225,18 @@ c     1	'a different LUN'
       detector_planeoffset = detector_planeoffset / 1e4    ! microns->cm
       detector_offset      = detector_offset/10.0          ! mm-->cm
       
-c      dipole_field = 3.335641 * beam_E / dipole_rho   ! Tesla
-  
+
+C calculate field from bend angle
+      dipole_bend = dipole_bend*Pi/180.0   ! deg. -? radians
+      dipole_rho = (dipole_length/100.0)/sin(dipole_bend) ! meters
+      dipole_field = 10.0/2.99792*beam_E/dipole_rho ! Tesla
+
+      dipole_field = dipole_field*10.0 ! T->kG
+
 c      dipole_field = (beam_E/0.3)*chicane_drop/100.0
 c     $        /((dipole_length+chicane_drift)*dipole_length*1E-4)    ! Tesla
-C get field from current (use field map): good to 0.1% from 60 to 110 A
-      dipole_field = 52.335*dipole_current + 65.660  !Gauss
-C     Note that this field is extracted from a map that gives
-C     Leff =124.58 cm. We want same Bdl but assuming 125 cm
-C     So B_MC = B_map*Lmap/Lideal = B_map * 124.58/125.0
-C     Also, B vs I curve taken not at y=0...need additional factor of 0.9986      
-      dipole_field = dipole_field*0.9986*(124.58/125.0) *1.0E-4
-      dipole_rho   = beam_E/0.3/dipole_field          ! in m
-      dipole_field = dipole_field * 10.               ! T -> kG
+
+
       if(dipole_rho.gt.0.0) then
          dipole_bend = asin(dipole_length/100.0/dipole_rho)
          dipole_h    = 100.0*dipole_rho*(1.0-cos(dipole_bend)) ! cm

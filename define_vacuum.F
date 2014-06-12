@@ -38,7 +38,7 @@ c Doug Storey Jan 23 2007
       integer beamline_mate, port_mate, foil_mate
       integer flange_mate
       real port_length,ltube3,ecylrad
-      parameter (port_length=150.)
+      parameter (port_length=350.)
       real pars(11)
 
       if (event_type_brem .ne. 0) then
@@ -158,7 +158,7 @@ c      pars(2) = (0.096*chicane_drift) ! Radius of detector cylinder
       pars(2)=ecylrad
       pars(3) = 10.0 ! Detector height      
       call ugsvolu ('DetVac', 'TUBE', pipe_vac, pars, 3, volume_b)
-      pars(2) = 3*chicane_drop/4.-1.5
+      pars(2) = 3*chicane_drop/4.+2.0
       pars(3) = chicane_length/2. - dipole_length - detector_posoffset
       call gspos ('DetVac', 1, mother, 0., pars(2), pars(3), 9, 'MANY')
       call gsatt ('DetVac', 'COLO', BLACK) ! Change color of the Pipe
@@ -167,7 +167,7 @@ c      pars(2) = (0.096*chicane_drift) ! Radius of detector cylinder
 c vacuum pipe in downstream leg - just make the pipe bigger
 
       pars(1) =  0.
-      pars(2) =  3.81 ! 3 inch pipe
+      pars(2) =  6.35 ! 5 inch pipe!!
       if(dipole_map.gt.0.1) then
          ltube3=chicane_drift-2.0*ecylrad-(156.0-dipole_length)
       else
@@ -175,7 +175,7 @@ c vacuum pipe in downstream leg - just make the pipe bigger
       endif
       pars(3)=(ltube3+6.4)/2.0
       call ugsvolu ('PIP3', 'TUBE', pipe_mate, pars, 3, volume_b)
-      pars(2) =  3.5 
+      pars(2) =  6.85 
       call ugsvolu ('PIV3', 'TUBE', pipe_vac, pars, 3, volume_b)
       call gspos ('PIV3', 1, 'PIP3', 0., 0., 0., 0, 'MANY')
       if(dipole_map.gt.0.1) then
@@ -189,7 +189,7 @@ c vacuum pipe in downstream leg - just make the pipe bigger
      >        (ltube3/chicane_drift) + 3.5*1.75
       else
          pars(2) = chicane_drop/2.0 * 
-     >        (ltube3/chicane_drift) + 3.5
+     >        (ltube3/chicane_drift) + 5.5
       endif
       call gspos ('PIP3', 1, mother, 0., pars(2), pars(3), 6, 'MANY')
       call gsatt ('PIP3', 'COLO', BLACK) ! Change color of the Pipe
@@ -245,10 +245,10 @@ c      call gspos('PIP3',1,mother,pars(1),pars(2),pars(3),0,'MANY')
 c add exit port for backscatter gammas
 
       pars(1) = 0.
-      pars(2) = 3.5
+      pars(2) = 2.5
       pars(3) = port_length / 2.
       call ugsvolu('PORT', 'TUBE', port_mate, pars, 3, volume_a)
-      pars(2) = 3.0
+      pars(2) = 2.0
       call ugsvolu('PORV', 'TUBE', pipe_vac, pars, 3, volume_a)
       call gspos ('PORV', 1, 'PORT', 0., 0., 0., 0, 'ONLY')
       pars(3) = foil_thickness / 2.
@@ -258,7 +258,7 @@ c add exit port for backscatter gammas
       if(dipole_map.gt.0.1) then
          pars(3) = pars(3) + chicane_mid/2 + 156.0*0.9
       else
-         pars(3) = pars(3) + chicane_mid/2 + dipole_length*0.9
+         pars(3) = pars(3) + chicane_mid/2 + dipole_length - 1.0
       endif
       call gspos ('PORT', 1, mother, 0., 0., pars(3), 0, 'MANY')
       call gsatt ('PORT', 'COLO', BLACK) ! Change color of the port

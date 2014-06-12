@@ -4,6 +4,8 @@ The starting point for this simulation is the Qweak simulation described below.
 To first order, I will try to put in the appropriate geometry for the low Q2
 tagger.
 
+Changes from Qweak version:
+
 
 Compton Polarimeter Simulation for Qweak
 ========================================
