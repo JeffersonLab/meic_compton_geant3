@@ -68,7 +68,7 @@ c   detector
       external hexist
 
        Integer nstr
-       REAL stefpl(384)    
+       REAL stefpl(880)    
        REAL*8 grnd,rand1,rand2,rand3,rand4
 
       integer NSHIELDS,NDETECTS,NPDETECTS,NEDETECTS
@@ -100,7 +100,7 @@ cpat      thetab = 0.174532925      ! rad
 
 c Effiencies of each strip
 
-          do i=1,384
+          do i=1,880
              stefpl(i) = 1
           enddo
 c
@@ -399,9 +399,12 @@ c         if (hexist(id) .and. total_energy .ge. 1e-6) then
 C DG Get rid of the energy cut for now. Almost every event passes, and it might
 C DG introduce bias.
          if (hexist(id)) then
+            if(Egam_dep.gt.0.0 .or. nht_pl1.gt.0 .or. nht_pl2.gt.0 .or. 
+     >      nht_pl3.gt.0 .or. nht_pl4.gt.0) then
 c            write(6,*)'GO AHEAD !', total_energy,Eparticle(1),
 c     $                              Eparticle(3)
-	    call hfnt(id)  ! fill ntuple
+               call hfnt(id)    ! fill ntuple
+            endif
          endif
       enddo   ! end loop over process types
 
