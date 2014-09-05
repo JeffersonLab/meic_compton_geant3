@@ -31,6 +31,7 @@ c    generating process.
 	integer i
 	real*8 random, grnd				! random number
 	real user(4)
+	real weight
 
 	real pressure				! pressure in vacuum line (torr)
 	data pressure/1e-9/
@@ -69,7 +70,8 @@ c To study synchrotron radiation you have to turn off bremsstrahlung.
 	  user(2) = 1			! cross section scale factor
 	  user(3) = halo_fraction * beam_flux	! luminosity scale factor
 	  user(4) = 0			! zero asymmetry
-	  call genhalo (vertex, p)
+	  call genhalo (vertex, p,weight)
+	  user(3)=user(3)*weight
 	  call ugsvert (vertex, 0, 0, 0, 0, vertex_num)
 	  call ugskine (p, electron_id, vertex_num, user, 4, track_num)
 	endif

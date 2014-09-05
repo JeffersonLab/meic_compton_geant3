@@ -90,6 +90,7 @@ c vacuum pipe in straight section
 c      call gspos ('PIVE', 1, 'PIPE', 0., 0., 0., 0, 'ONLY')
       call gspos ('PIVE', 1, 'PIPE', 0., 0., 0., 0, 'MANY')
 
+C Apertures for Fabry-Perot cavity
 
       pars(3) =-62.2
       call gspos ('UPPL', 1, 'PIVE', 0., 0., pars(3), 0, 'ONLY')    ! place aperture in vacuum in pipe
@@ -97,7 +98,9 @@ c      call gspos ('PIVE', 1, 'PIPE', 0., 0., 0., 0, 'ONLY')
       call gspos ('DNPL', 1, 'PIVE', 0., 0., pars(3), 0, 'ONLY')
 
 
-      pars(1) = 0.5
+c      pars(1) = 0.5
+C make the hole wider
+      pars(1) = 1.0
       pars(2) = 2.0    ! half lengths
       pars(3) = 0.635
       call ugsvolu('UHOL', 'BOX ',pipe_vac, pars, 3, volume_a)       ! openings
@@ -122,6 +125,7 @@ c      call gspos ('PIVE', 1, 'PIPE', 0., 0., 0., 0, 'ONLY')
       call gsatt ('DNPL', 'COLO', GREEN) 
       call gsatt ('DNPL', 'SEEN', 1)
 
+C end of FP cavity apertures
 
 c vacuum pipe in upstream leg
 

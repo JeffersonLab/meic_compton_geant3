@@ -48,7 +48,7 @@ c	generate Synchrotron (0-> no, !0 -> yes)
 c	generate source lines (0 -> no, !0 -> yes)
 c
 c
-TYPE 1 0 0 0 0
+TYPE 0 1 0 0 0
 c	
 c                                                                              
 c BEAM:
@@ -64,7 +64,7 @@ c	beta y of beam at exit to straight section in m
 c	emittance of beam in m-radians
 c	electron beam polarization
 c
-BEAM 3.0 10.0e-6 1.0E6 363.6 204.6 363.6 204.6 363.6 204.6 4.4e-10 0.8500
+BEAM 11.0 10.0e-6 3.0E6 363.6 204.6 363.6 204.6 363.6 204.6 4.4e-10 0.8500
 c
 c
 c HALO:
@@ -73,7 +73,7 @@ c       minimum radius of beam halo in cm
 c	maximum radius of beam halo in cm
 c	characteristic angle of beam halo in mr
 c
-HALO 1e-9 0.3 1.2 0.05
+HALO 1.0E-3 0.3 1.2 0.05
 c
 c
 c DIPOLE:
@@ -115,7 +115,7 @@ c	crossing angle of laser and electron beam in mr
 c	azimuthal angle of laser in mr
 c       Photon polarization
 c
-LASER 0.532 0.001 1000. 3.0e-6 0.148 0 0 0 23.53 0 1.0
+LASER 0.532 0.001 10000. 3.0e-6 0.148 0 0 0 47.06 0 1.0
 c
 c DETECTOR:
 c	width of active area (cm)	                       2.1    (defaults)
@@ -134,7 +134,7 @@ c	detector rotation angle about the x axis(degrees)     10.137686
 c       detector roll angle about the y axis (degrees)		0.0  Not yet active
 c       detector roll angle about the z axis (degrees)          0.0  Not yet active
 c
-DETECTOR 2.1 1.92 500. 180. 20. 96. 1.0 4 0. 9.0 24.5 34 2.29 0. 0.
+DETECTOR 2.1 4.6 500. 180. 20. 230. 1.0 4 0. 37.7 24.5 34 2.29 0. 0.
 c
 c HPGERMANIUM:
 c	distance from crossing point (m)
@@ -181,7 +181,7 @@ c       Seed1                                            2465761579
 c       Seed2                                            564186545
 c       Iseq (1-215)                                     42
 c       
-SEEDS 115406843 2895674585 198
+SEEDS 235508843 1355774585 201
 c
 c
 c Physics flags
